@@ -4,17 +4,18 @@ import (
 	"context"
 	"crypto/ed25519"
 	json "encoding/json"
-	"errors"
+	// "errors"
 	"fmt"
-	"strings"
+	// "strings"
 
 	"github.com/algorand/go-algorand-sdk/client/v2/algod"
-	"github.com/algorand/go-algorand-sdk/client/v2/common/models"
+	// "github.com/algorand/go-algorand-sdk/client/v2/common/models"
 
 	"github.com/algorand/go-algorand-sdk/crypto"
 	"github.com/algorand/go-algorand-sdk/mnemonic"
 	"github.com/algorand/go-algorand-sdk/transaction"
 	"github.com/algorand/go-algorand-sdk/types"
+	"github.com/algorand/go-algorand-sdk/future"
 )
 
 // This atomic transfer example code requires three (3) acounts:
@@ -52,49 +53,7 @@ func prettyPrint(data interface{}) {
 	}
 	fmt.Printf("%s \n", p)
 }
-// Function that waits for a given txId to be confirmed by the network
-func waitForConfirmation(txID string, client *algod.Client, timeout uint64) (models.PendingTransactionInfoResponse, error) {
-	pt := new(models.PendingTransactionInfoResponse)
-	if client == nil || txID == "" || timeout < 0 {
-		fmt.Printf("Bad arguments for waitForConfirmation")
-		var msg = errors.New("Bad arguments for waitForConfirmation")
-		return *pt, msg
 
-	}
-
-	status, err := client.Status().Do(context.Background())
-	if err != nil {
-		fmt.Printf("error getting algod status: %s\n", err)
-		var msg = errors.New(strings.Join([]string{"error getting algod status: "}, err.Error()))
-		return *pt, msg
-	}
-	startRound := status.LastRound + 1
-	currentRound := startRound
-
-	for currentRound < (startRound + timeout) {
-
-		*pt, _, err = client.PendingTransactionInformation(txID).Do(context.Background())
-		if err != nil {
-			fmt.Printf("error getting pending transaction: %s\n", err)
-			var msg = errors.New(strings.Join([]string{"error getting pending transaction: "}, err.Error()))
-			return *pt, msg
-		}
-		if pt.ConfirmedRound > 0 {
-			fmt.Printf("Transaction "+txID+" confirmed in round %d\n", pt.ConfirmedRound)
-			return *pt, nil
-		}
-		if pt.PoolError != "" {
-			fmt.Printf("There was a pool error, then the transaction has been rejected!")
-			var msg = errors.New("There was a pool error, then the transaction has been rejected")
-			return *pt, msg
-		}
-		fmt.Printf("waiting for confirmation\n")
-		status, err = client.StatusAfterBlock(currentRound).Do(context.Background())
-		currentRound++
-	}
-	msg := errors.New("Tx not found in round range")
-	return *pt, msg
-}
 
 // utility function to get address string
 func getAddress(mn string) string {
@@ -170,7 +129,7 @@ func main() {
 		return
 	}
 	txParams.FlatFee = true
-	var minFee uint64 = 1000
+	minFee := uint64(txParams.MinFee)
 	genID := txParams.GenesisID
 	genHash := txParams.GenesisHash
 	firstValidRound := uint64(txParams.FirstRoundValid)
@@ -181,7 +140,7 @@ func main() {
 	// from account 1 to account 3
 	fromAddr := account1
 	toAddr := account3
-	var amount uint64 = 1000000
+	var amount uint64 = 100000
 
 	tx1, err := transaction.MakePaymentTxnWithFlatFee(fromAddr, toAddr, minFee, amount, firstValidRound, lastValidRound, nil, "", genID, genHash)
 	if err != nil {
@@ -193,7 +152,7 @@ func main() {
 	// from account 2 to account 1
 	fromAddr = account2
 	toAddr = account1
-	amount = 2000000
+	amount = 200000
 	tx2, err := transaction.MakePaymentTxnWithFlatFee(fromAddr, toAddr, minFee, amount, firstValidRound, lastValidRound, nil, "", genID, genHash)
 	if err != nil {
 		fmt.Printf("Error creating transaction: %s\n", err)
@@ -244,12 +203,15 @@ func main() {
 		return
 	}
     fmt.Printf("Submitted transaction %s\n", pendingTxID)
-	// Wait for confirmation
-	confirmedTxn, err := waitForConfirmation(pendingTxID, algodClient, 4)
-	if err != nil {
+
+    confirmedTxn, err := future.WaitForConfirmation(algodClient, pendingTxID, 4, context.Background())
+    if err != nil {
 		fmt.Printf("Error waiting for confirmation on txID: %s\n", pendingTxID)
-		return
-	}
+        return
+    }
+	fmt.Printf("Confirmed Transaction: %s in Round %d\n", pendingTxID ,confirmedTxn.ConfirmedRound)
+
+
 	txnJSON, err := json.MarshalIndent(confirmedTxn.Transaction.Txn, "", "\t")
 	if err != nil {
 		fmt.Printf("Can not marshall txn data: %s\n", err)

@@ -5,7 +5,7 @@ import (
 	"crypto/ed25519"
 	json "encoding/json"
 	"fmt"
-
+	"github.com/algorand/go-algorand-sdk/future"
 	"github.com/algorand/go-algorand-sdk/client/v2/algod"
 	"github.com/algorand/go-algorand-sdk/crypto"
 	"github.com/algorand/go-algorand-sdk/mnemonic"
@@ -58,28 +58,7 @@ func loadAccounts() (map[int][]byte, map[int]string) {
 	return sks, pks
 }
 
-func waitForConfirmation(txID string, client *algod.Client) {
-	status, err := client.Status().Do(context.Background())
-	if err != nil {
-		fmt.Printf("error getting algod status: %s\n", err)
-		return
-	}
-	lastRound := status.LastRound
-	for {
-		pt, _, err := client.PendingTransactionInformation(txID).Do(context.Background())
-		if err != nil {
-			fmt.Printf("error getting pending transaction: %s\n", err)
-			return
-		}
-		if pt.ConfirmedRound > 0 {
-			fmt.Printf("Transaction "+txID+" confirmed in round %d\n", pt.ConfirmedRound)
-			break
-		}
-		fmt.Printf("waiting for confirmation\n")
-		lastRound++
-		status, err = client.StatusAfterBlock(lastRound).Do(context.Background())
-	}
-}
+
 
 // prettyPrint prints Go structs
 func prettyPrint(data interface{}) {
@@ -141,8 +120,8 @@ func main() {
 		return
 	}
 	// comment out the next two (2) lines to use suggested fees
-	txParams.FlatFee = true
-	txParams.Fee = 1000
+	// txParams.FlatFee = true
+	// txParams.Fee = 1000
 
 	// Get pre-defined set of keys for example
 	sks, pks := loadAccounts()
@@ -214,7 +193,6 @@ func main() {
 		fmt.Printf("Failed to sign transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID: %s\n", txid)
 	// Broadcast the transaction to the network
 	sendResponse, err := algodClient.SendRawTransaction(stx).Do(context.Background())
 	if err != nil {
@@ -222,11 +200,16 @@ func main() {
 		return
 	}
 	fmt.Printf("Submitted transaction %s\n", sendResponse)
-	// Wait for transaction to be confirmed
-	waitForConfirmation(txid, algodClient)
-	response, stxn, err := algodClient.PendingTransactionInformation(txid).Do(context.Background())
-    fmt.Printf("%s\n", stxn)
-	assetID := response.AssetIndex
+
+	// Wait for confirmation
+	confirmedTxn, err := future.WaitForConfirmation(algodClient,txid,  4, context.Background())
+	if err != nil {
+		fmt.Printf("Error wating for confirmation on txID: %s\n", txid)
+		return
+	}
+	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txid ,confirmedTxn.ConfirmedRound)
+
+	assetID := confirmedTxn.AssetIndex
 
 
 
@@ -274,8 +257,8 @@ func main() {
 		return
 	}
 	// comment out the next two (2) lines to use suggested fees
-	txParams.FlatFee = true
-	txParams.Fee = 1000
+	// txParams.FlatFee = true
+	// txParams.Fee = 1000
 
 	manager = pks[1]
 	oldmanager := pks[2]
@@ -291,17 +274,21 @@ func main() {
 		fmt.Printf("Failed to sign transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID: %s\n", txid)
+
 	// Broadcast the transaction to the network
 	sendResponse, err = algodClient.SendRawTransaction(stx).Do(context.Background())
 	if err != nil {
 		fmt.Printf("failed to send transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID raw: %s\n", txid)
 
-	// Wait for transaction to be confirmed
-	waitForConfirmation(txid,algodClient )
+	confirmedTxn, err = future.WaitForConfirmation(algodClient,txid,  4, context.Background())
+	if err != nil {
+		fmt.Printf("Error wating for confirmation on txID: %s\n", txid)
+		return
+	}
+	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txid ,confirmedTxn.ConfirmedRound)
+
 	// print created assetinfo for this asset
 	fmt.Printf("Asset ID: %d\n", assetID)
 	printCreatedAsset(assetID, pks[1], algodClient)
@@ -343,8 +330,8 @@ func main() {
 		return
 	}
 	// comment out the next two (2) lines to use suggested fees
-	txParams.FlatFee = true
-	txParams.Fee = 1000
+	// txParams.FlatFee = true
+	// txParams.Fee = 1000
 
 	txn, err = transaction.MakeAssetAcceptanceTxn(pks[3], note, txParams, assetID)
 	if err != nil {
@@ -357,17 +344,21 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Transaction ID: %s\n", txid)
+
 	// Broadcast the transaction to the network
 	sendResponse, err = algodClient.SendRawTransaction(stx).Do(context.Background())
 	if err != nil {
 		fmt.Printf("failed to send transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID raw: %s\n", txid)
 
-	// Wait for transaction to be confirmed
-	waitForConfirmation(txid, algodClient)
+
+	confirmedTxn, err = future.WaitForConfirmation(algodClient,txid,  4, context.Background())
+	if err != nil {
+		fmt.Printf("Error wating for confirmation on txID: %s\n", txid)
+		return
+	}
+	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txid ,confirmedTxn.ConfirmedRound)
 
 	// print created assetholding for this asset and Account 3, showing 0 balance
 	fmt.Printf("Asset ID: %d\n", assetID)
@@ -399,8 +390,8 @@ func main() {
 		return
 	}
 	// comment out the next two (2) lines to use suggested fees
-	txParams.FlatFee = true
-	txParams.Fee = 1000
+	// txParams.FlatFee = true
+	// txParams.Fee = 1000
 
 	sender := pks[1]
 	recipient := pks[3]
@@ -417,17 +408,23 @@ func main() {
 		fmt.Printf("Failed to sign transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID: %s\n", txid)
+
 	// Broadcast the transaction to the network
 	sendResponse, err = algodClient.SendRawTransaction(stx).Do(context.Background())
 	if err != nil {
 		fmt.Printf("failed to send transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID raw: %s\n", txid)
+
 
 	// Wait for transaction to be confirmed
-	waitForConfirmation(txid,algodClient)
+
+	confirmedTxn, err = future.WaitForConfirmation(algodClient,txid,  4, context.Background())
+	if err != nil {
+		fmt.Printf("Error wating for confirmation on txID: %s\n", txid)
+		return
+	}
+	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txid ,confirmedTxn.ConfirmedRound)
 
 	// print created assetholding for this asset and Account 3 and Account 1
 	// You should see amount of 10 in Account 3, and 990 in Account 1
@@ -465,8 +462,8 @@ func main() {
 		return
 	}
 	// comment out the next two (2) lines to use suggested fees
-	txParams.FlatFee = true
-	txParams.Fee = 1000
+	// txParams.FlatFee = true
+	// txParams.Fee = 1000
 	newFreezeSetting := true
 	target := pks[3]
 	txn, err = transaction.MakeAssetFreezeTxn(freeze, note, txParams, assetID, target, newFreezeSetting)
@@ -479,16 +476,21 @@ func main() {
 		fmt.Printf("Failed to sign transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID: %s\n", txid)
+
 	// Broadcast the transaction to the network
 	sendResponse, err = algodClient.SendRawTransaction(stx).Do(context.Background())
 	if err != nil {
 		fmt.Printf("failed to send transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID raw: %s\n", txid)
 	// Wait for transaction to be confirmed
-	waitForConfirmation(txid,algodClient)
+	confirmedTxn, err = future.WaitForConfirmation(algodClient,txid,  4, context.Background())
+	if err != nil {
+		fmt.Printf("Error wating for confirmation on txID: %s\n", txid)
+		return
+	}
+	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txid ,confirmedTxn.ConfirmedRound)
+
     // You should now see is-frozen value of true
 	fmt.Printf("Asset ID: %d\n", assetID)
 	fmt.Printf("Account 3: %s\n", pks[3])
@@ -523,8 +525,8 @@ func main() {
 		return
 	}
 	// comment out the next two (2) lines to use suggested fees
-	txParams.FlatFee = true
-	txParams.Fee = 1000
+	// txParams.FlatFee = true
+	// txParams.Fee = 1000
 	target = pks[3]
 	txn, err = transaction.MakeAssetRevocationTxn(clawback, target, amount, creator, note,
 		txParams, assetID)
@@ -537,16 +539,23 @@ func main() {
 		fmt.Printf("Failed to sign transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID: %s\n", txid)
+
 	// Broadcast the transaction to the network
 	sendResponse, err = algodClient.SendRawTransaction(stx).Do(context.Background())
 	if err != nil {
 		fmt.Printf("failed to send transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID raw: %s\n", txid)
+
 	// Wait for transaction to be confirmed
-	waitForConfirmation( txid, algodClient)
+
+	confirmedTxn, err = future.WaitForConfirmation(algodClient,txid,  4, context.Background())
+	if err != nil {
+		fmt.Printf("Error wating for confirmation on txID: %s\n", txid)
+		return
+	}
+	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txid ,confirmedTxn.ConfirmedRound)
+
 	// print created assetholding for this asset and Account 3 and Account 1
 	// You should see amount of 0 in Account 3, and 1000 in Account 1
 	fmt.Printf("Asset ID: %d\n", assetID)
@@ -588,8 +597,8 @@ func main() {
 		return
 	}
 	// comment out the next two (2) lines to use suggested fees
-	txParams.FlatFee = true
-	txParams.Fee = 1000
+	// txParams.FlatFee = true
+	// txParams.Fee = 1000
 
 	txn, err = transaction.MakeAssetDestroyTxn(manager, note, txParams, assetID)
 	if err != nil {
@@ -601,16 +610,24 @@ func main() {
 		fmt.Printf("Failed to sign transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID: %s\n", txid)
+
 	// Broadcast the transaction to the network
 	sendResponse, err = algodClient.SendRawTransaction(stx).Do(context.Background())
 	if err != nil {
 		fmt.Printf("failed to send transaction: %s\n", err)
 		return
 	}
-	fmt.Printf("Transaction ID raw: %s\n", txid)
+
 	// Wait for transaction to be confirmed
-	waitForConfirmation(txid,algodClient)
+
+
+	confirmedTxn, err = future.WaitForConfirmation(algodClient,txid,  4, context.Background())
+	if err != nil {
+		fmt.Printf("Error wating for confirmation on txID: %s\n", txid)
+		return
+	}
+	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txid ,confirmedTxn.ConfirmedRound)
+
 	fmt.Printf("Asset ID: %d\n", assetID)	
 	fmt.Printf("Account 3 must do a transaction for an amount of 0, \n" )
     fmt.Printf("with a closeRemainderTo to the creator account, to clear it from its accountholdings. \n")

@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"fmt"
+	"github.com/algorand/go-algorand-sdk/future"
 
 	"github.com/algorand/go-algorand-sdk/client/v2/algod"
 	modelsV2 "github.com/algorand/go-algorand-sdk/client/v2/common/models"
@@ -20,29 +21,7 @@ import (
 	"github.com/algorand/go-algorand-sdk/types"
 )
 
-// Function that waits for a given txId to be confirmed by the network
-func waitForConfirmation(txID string, client *algod.Client) {
-    status, err := client.Status().Do(context.Background())
-    if err != nil {
-        fmt.Printf("error getting algod status: %s\n", err)
-        return
-    }
-    lastRound := status.LastRound
-    for {
-        pt, _, err := client.PendingTransactionInformation(txID).Do(context.Background())
-        if err != nil {
-            fmt.Printf("error getting pending transaction: %s\n", err)
-            return
-        }
-        if pt.ConfirmedRound > 0 {
-            fmt.Printf("Transaction "+txID+" confirmed in round %d\n", pt.ConfirmedRound)
-            break
-        }
-        fmt.Printf("waiting for confirmation\n")
-        lastRound++
-        status, err = client.StatusAfterBlock(lastRound).Do(context.Background())
-    }
-}
+
 
 // prettyPrint prints Go structs
 func prettyPrint(data interface{}) {
@@ -88,10 +67,10 @@ func dryrunDebugging(lsig types.LogicSig, args [][]byte,tealFile []byte, client 
 
 func main() {
     // sandbox
-    // const algodAddress = "http://localhost:4001"
-    // const algodToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    const algodAddress = "http://127.0.0.1:54746"
-    const algodToken = "6b3a2ae3896f23be0a1f0cdd083b6d6d046fbeb594a3ce31f2963b717f74ad43"
+    const algodAddress = "http://localhost:4001"
+    const algodToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    // const algodAddress = "http://127.0.0.1:54746"
+    // const algodToken = "6b3a2ae3896f23be0a1f0cdd083b6d6d046fbeb594a3ce31f2963b717f74ad43"
 
     // const algodToken = "<algod-token>"
     // const algodAddress = "<algod-address>"
@@ -164,16 +143,16 @@ func main() {
         return
     }
     // comment out the next two (2) lines to use suggested fees
-    txParams.FlatFee = true
-    txParams.Fee = 1000
+    // txParams.FlatFee = true
+    // txParams.Fee = 1000
 
     // Make transaction
     // const receiver = "<receiver-address>"
     const receiver = "QUDVUXBX4Q3Y2H5K2AG3QWEOMY374WO62YNJFFGUTMOJ7FB74CMBKY6LPQ"	
     // const fee = <fee>
     // const amount = <amount>
-    const fee = 1000
-    const amount = 1000000
+    var fee = uint64(txParams.MinFee)
+    const amount = 100000
     note := []byte("Hello World")
     genID := txParams.GenesisID
     genHash := txParams.GenesisHash
@@ -215,9 +194,18 @@ func main() {
     if err != nil {
         fmt.Printf("Sending failed with %v\n", err)
     }
-    // Wait for transaction to be confirmed
-    waitForConfirmation(txID, algodClient)
     fmt.Printf("Transaction ID: %v\n", transactionID)
+
+    // Wait for confirmation
+	confirmedTxn, err := future.WaitForConfirmation(algodClient,txID,  4, context.Background())
+	if err != nil {
+		fmt.Printf("Error wating for confirmation on txID: %s\n", txID)
+		return
+	}
+	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txID ,confirmedTxn.ConfirmedRound)
+
+
+
     }
 // the response should look similar to this...
 // Result = {

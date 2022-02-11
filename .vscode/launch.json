@@ -34,7 +34,8 @@
             "program": "${file}",
             "skipFiles": [
                 "<node_internals>/**"
-            ]
+            ],
+            "console": "integratedTerminal"
         },
         {
             "name": ".NET Core Launch (console)",
