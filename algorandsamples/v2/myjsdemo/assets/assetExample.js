@@ -223,7 +223,7 @@ console.log(recoveredAccount3.addr);
     let ctx = (await algodclient.sendRawTransaction(rawSignedTxn).do());
     console.log("Transaction : " + ctx.txId);
     // wait for transaction to be confirmed
-   await algosdk.waitForConfirmation(algodclient, ctx.txId, 4);
+    await algosdk.waitForConfirmation(algodclient, ctx.txId, 4);
 
     // Get the asset information for the newly changed asset
     // use indexer or utiltiy function for Account info

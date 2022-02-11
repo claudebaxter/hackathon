@@ -3,6 +3,7 @@ from algosdk.v2client import algod
 from algosdk import account, encoding, mnemonic
 from algosdk.future.transaction import Multisig, PaymentTxn, MultisigTransaction
 import base64
+from algosdk.future.transaction import *
 
 # Change these values with mnemonics
 # mnemonic1 = "PASTE phrase for account 1"
@@ -24,38 +25,6 @@ account_2 = mnemonic.to_public_key(mnemonic2)
 
 private_key_3 = mnemonic.to_private_key(mnemonic3)
 account_3 = mnemonic.to_public_key(mnemonic3)
-
-# utility for waiting on a transaction confirmation
-def wait_for_confirmation(client, transaction_id, timeout):
-    """
-    Wait until the transaction is confirmed or rejected, or until 'timeout'
-    number of rounds have passed.
-    Args:
-        transaction_id (str): the transaction to wait for
-        timeout (int): maximum number of rounds to wait    
-    Returns:
-        dict: pending transaction information, or throws an error if the transaction
-            is not confirmed or rejected in the next timeout rounds
-    """
-    start_round = client.status()["last-round"] + 1
-    current_round = start_round
-
-    while current_round < start_round + timeout:
-       
-        try:
-            pending_txn = client.pending_transaction_info(transaction_id)
-        except Exception:
-            return 
-        if pending_txn.get("confirmed-round", 0) > 0:
-            return pending_txn
-        elif pending_txn["pool-error"]:  
-            raise Exception(
-                'pool error: {}'.format(pending_txn["pool-error"]))
-        client.status_after_block(current_round)                   
-        current_round += 1
-        print("Checking Round: ", current_round) 
-    raise Exception(
-        'pending tx not found in timeout rounds, timeout value = : {}'.format(timeout))
 
 
 
@@ -86,8 +55,8 @@ algod_client = algod.AlgodClient(algod_token, algod_address)
 # get suggested parameters
 params = algod_client.suggested_params()
 # comment out the next two (2) lines to use suggested fees
-params.flat_fee = True
-params.fee = 1000
+# params.flat_fee = True
+# params.fee = 1000
 
 # create a transaction
 sender = msig.address()
@@ -114,6 +83,7 @@ try:
     encoding.msgpack_encode(mtx))    
     print("TXID: ", txid)   
     confirmed_txn = wait_for_confirmation(algod_client, txid, 6)  
+    print("Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))
     print("Transaction information: {}".format(
         json.dumps(confirmed_txn, indent=4)))
     print("Decoded note: {}".format(base64.b64decode(

@@ -1,27 +1,12 @@
 from algosdk import algod, transaction, account, mnemonic
 from algosdk.v2client import algod
-from algosdk.future.transaction import PaymentTxn, LogicSig
+from algosdk.future.transaction import *
 import os
 import base64
 from algosdk.v2client.models import DryrunRequest, DryrunSource
 # from algosdk.testing import dryrun
 import json
 
-def wait_for_confirmation(client, txid):
-    """
-    Utility function to wait until the transaction is
-    confirmed before proceeding.
-    """
-    last_round = client.status().get('last-round')
-    txinfo = client.pending_transaction_info(txid)
-    while not (txinfo.get('confirmed-round') and txinfo.get('confirmed-round') > 0):
-        print("Waiting for confirmation")
-        last_round += 1
-        client.status_after_block(last_round)
-        txinfo = client.pending_transaction_info(txid)
-    print("Transaction {} confirmed in round {}.".format(
-        txid, txinfo.get('confirmed-round')))
-    return txinfo
 
 # Read a file
 def load_resource(res):
@@ -45,10 +30,10 @@ def dryrun_debug(lstx, mysource):
 try:
 
     # Create an algod client
-    # algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    # algod_address = "http://localhost:4001"
-    algod_token = "6b3a2ae3896f23be0a1f0cdd083b6d6d046fbeb594a3ce31f2963b717f74ad43"
-    algod_address = "http://127.0.0.1:54746"
+    algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    algod_address = "http://localhost:4001"
+    # algod_token = "6b3a2ae3896f23be0a1f0cdd083b6d6d046fbeb594a3ce31f2963b717f74ad43"
+    # algod_address = "http://127.0.0.1:54746"
     # algod_token = "<algod-token>"
     # algod_address = "<algod-address:port>"
     # receiver = "<receiver-address>"
@@ -119,8 +104,8 @@ try:
     # Get suggested parameters
     params = algod_client.suggested_params()
     # Comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
     # Build transaction
     amount = 10000
@@ -147,7 +132,11 @@ try:
 
     txid = algod_client.send_transaction(lstx)
     print("Transaction ID: " + txid)
-    wait_for_confirmation(algod_client, txid)
+
+    confirmed_txn = wait_for_confirmation(algod_client, txid, 4)
+    print("TXID: ", txid)
+    print("Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))
+
 except Exception as e:
     print(e)
 

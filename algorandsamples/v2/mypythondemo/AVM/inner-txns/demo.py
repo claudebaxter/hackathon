@@ -38,7 +38,7 @@ def demo():
     print("Sending grouped transaction: {}".format(txid))
 
     result = wait_for_confirmation(client, txid, 4)
-    print("Result confirmed in rount: {}".format(result['confirmed-round']))
+    print("Result confirmed in round: {}".format(result['confirmed-round']))
 
     info = client.account_info(app_addr)
     print("This Application Account has created:")

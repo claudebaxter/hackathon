@@ -1,25 +1,11 @@
 from algosdk import algod, transaction, account, mnemonic
 from algosdk.v2client import algod
-from algosdk.future.transaction import PaymentTxn, LogicSig
+
 import os
 import base64
+from algosdk.future.transaction import *
 
 
-def wait_for_confirmation(client, txid):
-    """
-    Utility function to wait until the transaction is
-    confirmed before proceeding.
-    """
-    last_round = client.status().get('last-round')
-    txinfo = client.pending_transaction_info(txid)
-    while not (txinfo.get('confirmed-round') and txinfo.get('confirmed-round') > 0):
-        print("Waiting for confirmation")
-        last_round += 1
-        client.status_after_block(last_round)
-        txinfo = client.pending_transaction_info(txid)
-    print("Transaction {} confirmed in round {}.".format(
-        txid, txinfo.get('confirmed-round')))
-    return txinfo
 
 # Read a file
 
@@ -109,8 +95,8 @@ try:
     # Get suggested parameters
     params = algod_client.suggested_params()
     # Comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
     # Build transaction
     amount = 10000
@@ -126,6 +112,9 @@ try:
     # Send raw LogicSigTransaction to network
     txid = algod_client.send_transaction(lstx)
     print("Transaction ID: " + txid)
-    wait_for_confirmation(algod_client, txid)
+
+    confirmed_txn = wait_for_confirmation(algod_client, txid, 4)
+    print("TXID: ", txid)
+    print("Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))    
 except Exception as e:
     print(e)

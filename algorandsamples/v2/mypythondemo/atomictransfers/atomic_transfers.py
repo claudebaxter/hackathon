@@ -4,9 +4,9 @@ import base64
 import os
 from algosdk.v2client import algod
 from algosdk import mnemonic
-from algosdk.future import transaction
 from algosdk import encoding
 from algosdk import account
+from algosdk.future.transaction import *
 
 # This atomic transfer example code requires three (3) acounts:
 #  - account_1 requires a user-defined mnemonic and be funded with 1001000 microAlgos
@@ -32,20 +32,7 @@ algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 # algod_token = "2f3203f21e738a1de6110eba6984f9d03e5a95d7a577b34616854064cf2c0e7b"
 # algod_address = "https://academy-algod.dev.aws.algodev.network/"
 
-# Function that waits for a given txId to be confirmed by the network
 
-
-def wait_for_confirmation(client, txid):
-    last_round = client.status().get('last-round')
-    txinfo = client.pending_transaction_info(txid)
-    while not (txinfo.get('confirmed-round') and txinfo.get('confirmed-round') > 0):
-        print("Waiting for confirmation...")
-        last_round += 1
-        client.status_after_block(last_round)
-        txinfo = client.pending_transaction_info(txid)
-    print("Transaction {} confirmed in round {}.".format(
-        txid, txinfo.get('confirmed-round')))
-    return txinfo
 
 # utility function to get address string
 
@@ -109,8 +96,8 @@ def group_transactions():
 # from account 1 to account 3
     sender = account_1
     receiver = account_3
-    amount = 1000000
-    txn_1 = transaction.PaymentTxn(sender, params, receiver, amount)
+    amount = 100000
+    txn_1 = PaymentTxn(sender, params, receiver, amount)
     print("...txn_1: from {} to {} for {} microAlgos".format(
         sender, receiver, amount))
     print("...created txn_1: ", txn_1.get_txid())
@@ -118,8 +105,8 @@ def group_transactions():
 # from account 2 to account 1
     sender = account_2
     receiver = account_1
-    amount = 2000000
-    txn_2 = transaction.PaymentTxn(sender, params, receiver, amount)
+    amount = 200000
+    txn_2 = PaymentTxn(sender, params, receiver, amount)
     print("...txn_2: from {} to {} for {} microAlgos".format(
         sender, receiver, amount))
     print("...created txn_2: ", txn_2.get_txid())
@@ -157,8 +144,10 @@ def group_transactions():
     tx_id = algod_client.send_transactions(signedGroup)
 
     # wait for confirmation
-    wait_for_confirmation(algod_client, tx_id)
 
+    confirmed_txn = wait_for_confirmation(algod_client, tx_id, 4)
+    print("txID: {}".format(tx_id), " confirmed in round: {}".format(
+    confirmed_txn.get("confirmed-round", 0)))   
 # display account balances
     print("Final balances:")
     display_account_algo_balance(algod_client, account_1)

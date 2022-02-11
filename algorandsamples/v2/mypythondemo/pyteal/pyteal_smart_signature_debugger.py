@@ -2,15 +2,18 @@
 
 #  refund this account every run
 #  BI6CRIUTBD6FRFDRPVIMYPZHLZ2H5K3F5H2MSBHONCN4RYM5I72MQOHEOU
+from distutils.util import execute
 from pyteal import *
 
 import base64
 import os
 from algosdk import account, algod, encoding, mnemonic, transaction
 from algosdk.v2client import algod
-from algosdk.future.transaction import PaymentTxn, LogicSig
+
 from algosdk.v2client.models.dryrun_source import DryrunSource
 from algosdk.v2client.models.dryrun_request import DryrunRequest
+
+from algosdk.future.transaction import *
 
 import json
 
@@ -32,23 +35,6 @@ def write_teal(res, contents):
     f.write(str(contents))
     f.close()
     return
-
-
-def wait_for_confirmation(client, txid):
-    """
-    Utility function to wait until the transaction is
-    confirmed before proceeding.
-    """
-    last_round = client.status().get('last-round')
-    txinfo = client.pending_transaction_info(txid)
-    while not (txinfo.get('confirmed-round') and txinfo.get('confirmed-round') > 0):
-        print("Waiting for confirmation")
-        last_round += 1
-        client.status_after_block(last_round)
-        txinfo = client.pending_transaction_info(txid)
-    print("Transaction {} confirmed in round {}.".format(
-        txid, txinfo.get('confirmed-round')))
-    return txinfo
 
 
 # return dry run request (needed for debugging)
@@ -120,10 +106,10 @@ write_teal(program_file_name, teal_source)
 
 # read TEAL program
 # data = load_resource(myprogram)
-# algod_address = "http://localhost:4001"
-# algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-algod_address = "http://localhost:8080"
-algod_token = "8024065d94521d253181cff008c44fa4ae4bdf44f028834cd4b4769a26282de1"
+algod_address = "http://localhost:4001"
+algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+# algod_address = "http://localhost:8080"
+# algod_token = "8024065d94521d253181cff008c44fa4ae4bdf44f028834cd4b4769a26282de1"
 # create algod clients
 acl = algod.AlgodClient(algod_token, algod_address)
 try:
@@ -156,8 +142,8 @@ try:
 
     # get suggested parameters
     params = acl.suggested_params()
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
     amount = 0
     print(params.last)
     print(params.first)
@@ -189,12 +175,16 @@ try:
     dir_path = os.path.dirname(os.path.realpath(__file__))
     drrpath = os.path.join(dir_path, drr_file_name)
     programpath = os.path.join(dir_path, program_file_name)
-    stdout, stderr = execute(
-        ["tealdbg", "debug", programpath, "--dryrun-req", drrpath])
+    # stdout, stderr = execute(
+    #     ["tealdbg", "debug", programpath, "--dryrun-req", drrpath])
     txns = [lstx]
     # send raw LogicSigTransaction to network
     txid = acl.send_transaction(lstx)
     print("Transaction ID: " + txid)
-    wait_for_confirmation(acl, txid)
+    confirmed_txn = wait_for_confirmation(acl, txid, 4)
+    print("TXID: ", txid)
+    print("Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))
+
+
 except Exception as e:
     print(e)

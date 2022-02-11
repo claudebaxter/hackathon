@@ -6,12 +6,12 @@ import base64
 import os
 from algosdk import account, algod, encoding, mnemonic, transaction
 from algosdk.v2client import algod
-from algosdk.future import transaction
+
 from algosdk.future.transaction import StateSchema, ApplicationCreateTxn
 from algosdk.v2client.models.dryrun_source import DryrunSource
 from algosdk.v2client.models.dryrun_request import DryrunRequest
 import json
-
+from algosdk.future.transaction import *
 
 def write_drr(res, contents):
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -31,37 +31,6 @@ def write_teal(res, contents):
     f.close()
     return
 
-# utility for waiting on a transaction confirmation
-
-
-def wait_for_confirmation(client, transaction_id, timeout):
-    """
-    Wait until the transaction is confirmed or rejected, or until 'timeout'
-    number of rounds have passed.
-    Args:
-        transaction_id (str): the transaction to wait for
-        timeout (int): maximum number of rounds to wait    
-    Returns:
-        dict: pending transaction information, or throws an error if the transaction
-            is not confirmed or rejected in the next timeout rounds
-    """
-    start_round = client.status()["last-round"] + 1
-    current_round = start_round
-
-    while current_round < start_round + timeout:
-        try:
-            pending_txn = client.pending_transaction_info(transaction_id)
-        except Exception:
-            return
-        if pending_txn.get("confirmed-round", 0) > 0:
-            return pending_txn
-        elif pending_txn["pool-error"]:
-            raise Exception(
-                'pool error: {}'.format(pending_txn["pool-error"]))
-        client.status_after_block(current_round)
-        current_round += 1
-    raise Exception(
-        'pending tx not found in timeout rounds, timeout value = : {}'.format(timeout))
 
 # return dry run request (needed for debugging)
 
@@ -146,13 +115,13 @@ def create_app(client, private_key, approval_program_compiled, clear_program, gl
     # define sender as creator
     sender = account.address_from_private_key(private_key)
     # declare on_complete as NoOp
-    on_complete = transaction.OnComplete.NoOpOC.real
+    on_complete = OnComplete.NoOpOC.real
 
     # get node suggested parameters
     params = client.suggested_params()
     # comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
     # create unsigned transaction - Create App
     txn = ApplicationCreateTxn(sender,
@@ -170,6 +139,9 @@ def create_app(client, private_key, approval_program_compiled, clear_program, gl
     # wait for confirmation
     try:
         transaction_response = wait_for_confirmation(client, tx_id, 4)
+        print("TXID: ", tx_id)
+        print("Result confirmed in round: {}".format(transaction_response['confirmed-round']))
+       
     except Exception as err:
         print(err)
         return
@@ -191,11 +163,11 @@ def opt_in_app(client, private_key, index):
     # get node suggested parameters
     params = client.suggested_params()
     # comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
     # create unsigned transaction
-    txn = transaction.ApplicationOptInTxn(sender, params, index)
+    txn = ApplicationOptInTxn(sender, params, index)
 
     # sign transaction
     signed_txn = txn.sign(private_key)
@@ -207,6 +179,8 @@ def opt_in_app(client, private_key, index):
     # wait for confirmation
     try:
         transaction_response = wait_for_confirmation(client, tx_id, 4)
+        print("TXID: ", tx_id)
+        print("Result confirmed in round: {}".format(transaction_response['confirmed-round']))
     except Exception as err:
         print(err)
         return
@@ -230,11 +204,11 @@ def call_app(client, private_key_user, index, app_args, approval_program_source,
     # get node suggested parameters
     params = client.suggested_params()
     # comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
     # create unsigned transaction
-    txn = transaction.ApplicationNoOpTxn(user, params, index, app_args)
+    txn = ApplicationNoOpTxn(user, params, index, app_args)
 
     # sign transaction
     signed_txn = txn.sign(private_key_user)
@@ -268,6 +242,8 @@ def call_app(client, private_key_user, index, app_args, approval_program_source,
     # wait for confirmation
     try:
         transaction_response = wait_for_confirmation(client, tx_id, 4)
+        print("TXID: ", tx_id)
+        print("Result confirmed in round: {}".format(transaction_response['confirmed-round']))
     except Exception as err:
         print(err)
         return
@@ -315,11 +291,11 @@ def update_app(client, private_key, app_id, approval_program, clear_program):
     # get node suggested parameters
     params = client.suggested_params()
     # comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
     # create unsigned transaction
-    txn = transaction.ApplicationUpdateTxn(sender, params, app_id,
+    txn = ApplicationUpdateTxn(sender, params, app_id,
                                            approval_program, clear_program, None)
 
     # sign transaction
@@ -332,6 +308,9 @@ def update_app(client, private_key, app_id, approval_program, clear_program):
     # wait for confirmation
     try:
         transaction_response = wait_for_confirmation(client, tx_id, 4)
+        print("TXID: ", tx_id)
+        print("Result confirmed in round: {}".format(transaction_response['confirmed-round']))
+
     except Exception as err:
         print(err)
         return
@@ -350,11 +329,11 @@ def delete_app(client, private_key, index):
     # get node suggested parameters
     params = client.suggested_params()
     # comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
     # create unsigned transaction
-    txn = transaction.ApplicationDeleteTxn(sender, params, index)
+    txn = ApplicationDeleteTxn(sender, params, index)
 
     # sign transaction
     signed_txn = txn.sign(private_key)
@@ -366,6 +345,9 @@ def delete_app(client, private_key, index):
     # wait for confirmation
     try:
         transaction_response = wait_for_confirmation(client, tx_id, 4)
+        print("TXID: ", tx_id)
+        print("Result confirmed in round: {}".format(transaction_response['confirmed-round']))
+
     except Exception as err:
         print(err)
         return
@@ -384,11 +366,11 @@ def close_out_app(client, private_key, index):
     # get node suggested parameters
     params = client.suggested_params()
     # comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
     # create unsigned transaction
-    txn = transaction.ApplicationCloseOutTxn(sender, params, index)
+    txn = ApplicationCloseOutTxn(sender, params, index)
 
     # sign transaction
     signed_txn = txn.sign(private_key)
@@ -400,6 +382,9 @@ def close_out_app(client, private_key, index):
     # wait for confirmation
     try:
         transaction_response = wait_for_confirmation(client, tx_id, 4)
+        print("TXID: ", tx_id)
+        print("Result confirmed in round: {}".format(transaction_response['confirmed-round']))
+
     except Exception as err:
         print(err)
         return
@@ -423,7 +408,7 @@ def clear_app(client, private_key, index):
     params.fee = 1000
 
     # create unsigned transaction
-    txn = transaction.ApplicationClearStateTxn(sender, params, index)
+    txn = ApplicationClearStateTxn(sender, params, index)
 
     # sign transaction
     signed_txn = txn.sign(private_key)
@@ -435,6 +420,9 @@ def clear_app(client, private_key, index):
     # wait for confirmation
     try:
         transaction_response = wait_for_confirmation(client, tx_id, 4)
+        print("TXID: ", tx_id)
+        print("Result confirmed in round: {}".format(transaction_response['confirmed-round']))
+
     except Exception as err:
         print(err)
         return
@@ -453,10 +441,10 @@ def main():
 
     # read TEAL program
     # data = load_resource(myprogram)
-    # algod_address = "http://localhost:4001"
-    # algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    algod_address = "http://localhost:8080"
-    algod_token = "8024065d94521d253181cff008c44fa4ae4bdf44f028834cd4b4769a26282de1"
+    algod_address = "http://localhost:4001"
+    algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    # algod_address = "http://localhost:8080"
+    # algod_token = "8024065d94521d253181cff008c44fa4ae4bdf44f028834cd4b4769a26282de1"
 
     # create algod clients
     acl = algod.AlgodClient(algod_token, algod_address)
@@ -464,15 +452,15 @@ def main():
     # compile programs approval_program_source
     # and approval_program_source_refactored
     approval_program_source = compileTeal(
-        approval_program_initial(), Mode.Application, version=2)
+        approval_program_initial(), Mode.Application, version=5)
     write_teal('hello_world.teal', approval_program_source)
 
     approval_program_refactored_source = compileTeal(
-        approval_program_refactored(), Mode.Application, version=2)
+        approval_program_refactored(), Mode.Application, version=5)
     write_teal('hello_world_updated.teal',
                approval_program_refactored_source)
 
-    clear_program_source = compileTeal(clear_state_program(), Mode.Application, version=2)
+    clear_program_source = compileTeal(clear_state_program(), Mode.Application, version=5)
     write_teal('hello_world_clear.teal', clear_program_source)
 
     approval_program_compiled = compile_program(acl, approval_program_source)

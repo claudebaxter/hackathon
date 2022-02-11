@@ -3,23 +3,8 @@ import time
 import base64
 from algosdk import mnemonic
 from algosdk.v2client import algod
-from algosdk.future.transaction import PaymentTxn
+from algosdk.future.transaction import *
 
-def wait_for_confirmation(client, txid):
-	"""
-	Utility function to wait until the transaction is
-	confirmed before proceeding.
-	"""
-	last_round = client.status().get('last-round')
-	txinfo = client.pending_transaction_info(txid)
-	while not (txinfo.get('confirmed-round') and txinfo.get('confirmed-round') > 0):
-		print("Waiting for confirmation")
-		last_round += 1
-		client.status_after_block(last_round)
-		txinfo = client.pending_transaction_info(txid)
-	print("Transaction {} confirmed in round {}.".format(
-		txid, txinfo.get('confirmed-round')))
-	return txinfo
 
 def getting_started_example():
     algod_address = "http://localhost:4001"
@@ -31,10 +16,10 @@ def getting_started_example():
 
 # Part 2
 # send from account 3 to account 2 and sign from Account 1
-
-    account1_passphrase = "fringe model trophy claw stove perfect address market license abstract master slender choice around field embark sudden carbon exclude abuse square bulb front ability violin"
-    account2_passphrase = "impulse nation creek toy carpet amused dream can small long disorder source mail game category damp spread length cupboard theory either baby squeeze about orbit"
-    account3_passphrase = "fade exit sword someone lock minimum scout keen label dance jaguar select conduct luxury rose idea solid major solid lens globe agent assume abstract alien"
+# demo notes: delete 3 accounts and change these passphrases
+    account1_passphrase = "install blossom apart critic exhibit rather author ability arrest mango segment salute damage deer release obey help whip illness fever best relief voyage absent asset"
+    account2_passphrase = "butter private lunar heavy explain panic melt dog want athlete animal stay bless spoon switch language check know zone return parade blossom apple ability injury"
+    account3_passphrase = "cup major panther cycle merit fox over cram tower trumpet road option flee evoke plate one aspect napkin wife banana poet august kitchen absorb local"
     
     account1 = mnemonic.to_public_key(account1_passphrase)
     account2 = mnemonic.to_public_key(account2_passphrase)    
@@ -49,8 +34,8 @@ def getting_started_example():
     # build transaction
     params = algod_client.suggested_params()
     # comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
 
     # opt-in send tx to same address as sender and use 0 for amount w rekey account
@@ -69,7 +54,10 @@ def getting_started_example():
     print("Signed transaction with txID: {}".format(txid))
 
     # wait for confirmation
-    wait_for_confirmation(algod_client, txid)
+
+    confirmed_txn = wait_for_confirmation(algod_client, txid, 4)
+    print("TXID: ", txid)
+    print("Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))
 
     # read transction
     try:
@@ -104,8 +92,10 @@ def getting_started_example():
     print("Signed transaction with txID: {}".format(txid))
 
     # wait for confirmation
-    wait_for_confirmation(algod_client, txid)
 
+    confirmed_txn = wait_for_confirmation(algod_client, txid, 4)
+    print("TXID: ", txid)
+    print("Result confirmed in round: {}".format(confirmed_txn['confirmed-round']))
     account_info_rekey = algod_client.account_info(account3)
     print("Account 3 information (from) : {}".format(
         json.dumps(account_info_rekey, indent=4)))
