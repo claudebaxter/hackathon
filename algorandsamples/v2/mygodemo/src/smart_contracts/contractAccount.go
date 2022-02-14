@@ -132,7 +132,7 @@ func main() {
 	// Wait for confirmation
 	confirmedTxn, err := future.WaitForConfirmation(algodClient,transactionID,  4, context.Background())
 	if err != nil {
-		fmt.Printf("Error wating for confirmation on txID: %s\n", transactionID)
+		fmt.Printf("Error waiting for confirmation on txID: %s\n", transactionID)
 		return
 	}
 	fmt.Printf("Confirmed Transaction: %s in Round %d\n", transactionID ,confirmedTxn.ConfirmedRound)

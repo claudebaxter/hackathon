@@ -4,17 +4,12 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"github.com/algorand/go-algorand-sdk/future"
-
 	"github.com/algorand/go-algorand-sdk/client/v2/algod"
-	"github.com/algorand/go-algorand-sdk/client/v2/common/models"
 	"github.com/algorand/go-algorand-sdk/crypto"
-
 	transaction "github.com/algorand/go-algorand-sdk/future"
 )
 
@@ -46,7 +41,7 @@ func main() {
 	// Fund account
 	fmt.Println("Fund Alice's new account using testnet faucet:\n--> https://dispenser.testnet.aws.algodev.network?account=" + myAddress)
 	fmt.Println("--> Once funded, press ENTER key to continue...")
-	fmt.Scanln()
+	// fmt.Scanln()
 
 	// Hash the source image file
 	fmt.Println("Hashing the source file...")
@@ -126,7 +121,7 @@ func main() {
 	// Wait for confirmation
 	confirmedTxn, err := future.WaitForConfirmation(algodClient,txID,  4, context.Background())
 	if err != nil {
-		fmt.Printf("Error wating for confirmation on txID: %s\n", txID)
+		fmt.Printf("Error waiting for confirmation on txID: %s\n", txID)
 		return
 	}
 	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txID ,confirmedTxn.ConfirmedRound)
@@ -157,7 +152,7 @@ func main() {
 	// Wait for confirmation
 	confirmedTxn, err = future.WaitForConfirmation(algodClient,txID,  4, context.Background())
 	if err != nil {
-		fmt.Printf("Error wating for confirmation on txID: %s\n", txID)
+		fmt.Printf("Error waiting for confirmation on txID: %s\n", txID)
 		return
 	}
 	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txID ,confirmedTxn.ConfirmedRound)

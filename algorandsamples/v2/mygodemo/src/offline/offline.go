@@ -146,7 +146,7 @@ func readUnsignedTransaction() {
 	// Wait for confirmation
 	confirmedTxn, err := future.WaitForConfirmation(algodClient,txID,  4, context.Background())
 	if err != nil {
-		fmt.Printf("Error wating for confirmation on txID: %s\n", txID)
+		fmt.Printf("Error waiting for confirmation on txID: %s\n", txID)
 		return
 	}
 	fmt.Printf("Confirmed Transaction: %s in Round %d\n", txID ,confirmedTxn.ConfirmedRound)
@@ -239,7 +239,7 @@ func readSignedTransaction() {
 	// Wait for confirmation
 	confirmedTxn, err := future.WaitForConfirmation(algodClient,sendResponse,  4, context.Background())
 	if err != nil {
-		fmt.Printf("Error wating for confirmation on txID: %s\n", sendResponse)
+		fmt.Printf("Error waiting for confirmation on txID: %s\n", sendResponse)
 		return
 	}
 	fmt.Printf("Confirmed Transaction: %s in Round %d\n", sendResponse ,confirmedTxn.ConfirmedRound)
