@@ -1,7 +1,8 @@
 const algosdk = require('algosdk');
 const crypto = require('crypto');
 //const fs = require('fs');
-const fs = require('fs/promises');
+//const fs = require('fs/promises');
+const fs = require('fs').promises
 // see ASA param conventions here: https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0003.md
 // for JavaScript SDK doc see: https://algorand.github.io/js-algorand-sdk/
 

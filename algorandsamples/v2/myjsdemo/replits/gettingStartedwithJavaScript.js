@@ -65,7 +65,7 @@ async function firstTransaction() {
         const receiver = "HZ57J3K46JIJXILONBBZOHX6BKPXEM2VVXNRFSUED6DKFD5ZD24PMJ3MVA";
         const enc = new TextEncoder();
         const note = enc.encode("Hello World");
-        let amount = 1000000;
+        let amount = 100000;
         let closeout = receiver; //closeRemainderTo - return remainder to TestNet faucet
         let sender = myAccount.addr;
         let txn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeout, note, params);

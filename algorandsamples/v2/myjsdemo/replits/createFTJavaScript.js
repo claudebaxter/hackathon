@@ -159,6 +159,8 @@ async function createAsset(algodClient, alice) {
     let assetID = null;
     // wait for transaction to be confirmed
     const ptx = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
+    console.log("Transaction " + tx.txId + " confirmed in round " + ptx["confirmed-round"]);
+
     //Get the completed Transaction
     assetID = ptx["asset-index"];
     // console.log("AssetID = " + assetID);
