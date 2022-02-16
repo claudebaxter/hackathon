@@ -1,5 +1,5 @@
 
-package com.algorand.javatest.indexer;
+package com.algorand.javatest.replits;
 
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
@@ -11,7 +11,8 @@ import com.algorand.algosdk.v2.client.model.AssetsResponse;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 import org.json.JSONObject;
 
-public class IndexerExamples {
+// class Main on replit
+public class ASAIndexerJava {
     public Client indexerInstance = null;
 
     // utility function to connect to a node
@@ -23,7 +24,7 @@ public class IndexerExamples {
     }
 
     public static void main(String args[]) throws Exception {
-        IndexerExamples ex = new IndexerExamples();
+        ASAIndexerJava ex = new ASAIndexerJava();
         IndexerClient indexerClientInstance = (IndexerClient) ex.connectToNetwork();
         assetBalances(indexerClientInstance);
         searchAssetName(indexerClientInstance);

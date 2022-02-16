@@ -1,4 +1,4 @@
-package com.algorand.javatest.assets;
+package com.algorand.javatest.replits;
 
 import com.algorand.algosdk.account.Account;
 import java.math.BigInteger;
@@ -23,8 +23,8 @@ import com.algorand.algosdk.v2.client.Utils;
 
 // see ASA param conventions here: https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0003.md
 
-public class GettingStartedASAIntegrations {
-    // Create Account
+public class GettingStartedASASecurityTokens {
+
     static Scanner scan = new Scanner(System.in);
     public String DISPENSER = "HZ57J3K46JIJXILONBBZOHX6BKPXEM2VVXNRFSUED6DKFD5ZD24PMJ3MVA";
     public AlgodClient client = null;
@@ -103,7 +103,7 @@ public class GettingStartedASAIntegrations {
         // assetTotal = 1, decimals = 0, result is 1 total actual
 
         // set quantity and decimal placement
-        BigInteger assetTotal = BigInteger.valueOf(1000000);
+        BigInteger assetTotal = BigInteger.valueOf(999);
         // integer number of decimals for asset unit calculation
         Integer decimals = 0; 
         // read transaction from file
@@ -173,8 +173,7 @@ public class GettingStartedASAIntegrations {
             String id = rawtxresponse.body().txId;
 
             // Wait for transaction confirmation
-
-            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client,id,4);          
+            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
             System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
 
             assetID = pTrx.assetIndex;
@@ -237,7 +236,7 @@ public class GettingStartedASAIntegrations {
             String id = rawtxresponse.body().txId;
 
             // Wait for transaction confirmation
-            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client,id,4);          
+            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
             System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
             // Read the transaction
             // JSONObject jsonObj = new JSONObject(pTrx.toString());
@@ -270,11 +269,8 @@ public class GettingStartedASAIntegrations {
         // System.out.println("Algorand suggested parameters: " + params);
         // configuration changes must be done by
         // the manager account - changing manager of the asset
-        Transaction tx = Transaction.AssetAcceptTransactionBuilder()
-                .acceptingAccount(bob.getAddress())
-                .assetIndex(assetID)
-                .suggestedParams(params)
-                .build();
+        Transaction tx = Transaction.AssetAcceptTransactionBuilder().acceptingAccount(bob.getAddress())
+                .assetIndex(assetID).suggestedParams(params).build();
         // The transaction must be signed by the current manager account
         SignedTransaction signedTx = bob.signTransaction(tx);
         // send the transaction to the network and
@@ -291,12 +287,11 @@ public class GettingStartedASAIntegrations {
             }
             String id = rawtxresponse.body().txId;
             // Wait for transaction confirmation
-            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client,id,4);          
-            System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
-
+            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
 
             // We list the account information for acct1
             // and check that the asset is no longer exist
+            System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
 
             // We can now list the account information for acct3
             // and see that it can accept the new asset
@@ -325,8 +320,8 @@ public class GettingStartedASAIntegrations {
         }
         // System.out.println("Algorand suggested parameters: " + params);
         // params.fee = 0 means use suggested fee per byte -
-        // params.fee = (long) 0;
-        BigInteger assetAmount = BigInteger.valueOf(100000);
+        params.fee = (long) 0;
+        BigInteger assetAmount = BigInteger.valueOf(100);
 
         Transaction tx = Transaction.AssetTransferTransactionBuilder()
                 .sender(alice.getAddress())
@@ -352,12 +347,12 @@ public class GettingStartedASAIntegrations {
             }
             String id = rawtxresponse.body().txId;
             // Wait for transaction confirmation
-            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client,id,4);          
-            System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
-
+            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
 
             // We list the account information for acct1
             // and check that the asset is no longer exist
+            System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
+
             // We can now list the account information for acct3
             // and see that it can accept the new asset
             System.out.println("Alice Account = " + alice.getAddress().toString());
@@ -372,12 +367,11 @@ public class GettingStartedASAIntegrations {
         }
     }
 
-    // transfer back from Bob to Alice and closeout asset
-    public void closeoutAssetHoldings(Account bob, Account alice, Long assetID) throws Exception {
+    public void freezeAsset(Account alice, Account bob, Long assetID) throws Exception {
         System.out.println(String.format(""));
-        System.out.println(String.format("==> TRANSFER ASSETS BACK FROM BOB TO ALICE"));    
-        // TRANSFER ASSET
-        // Transfer the Asset:
+        System.out.println(String.format("==> FREEZE BOB'S ASSETS"));
+        // FREEZE ASSET
+
         Response<TransactionParametersResponse> resp = client.TransactionParams().execute();
         if (!resp.isSuccessful()) {
             throw new Exception(resp.message());
@@ -387,7 +381,126 @@ public class GettingStartedASAIntegrations {
             throw new Exception("Params retrieval error");
         }
         // System.out.println("Algorand suggested parameters: " + params);
-        BigInteger assetAmount = BigInteger.valueOf(100000);
+        // params.fee = 0 means use suggested fee per byte -
+        // params.fee = (long) 0;
+
+        boolean freezeState = true;
+        Transaction tx = Transaction.AssetFreezeTransactionBuilder()
+                .sender(alice.getAddress())
+                .freezeTarget(bob.getAddress())
+                .freezeState(freezeState)
+                .assetIndex(assetID)
+                .suggestedParams(params)
+                .build();
+        // The transaction must be signed by the current manager account
+        SignedTransaction signedTx = alice.signTransaction(tx);
+        // send the transaction to the network and
+        try {
+
+            String[] headers = { "Content-Type" };
+            String[] values = { "application/x-binary" };
+            // Submit the transaction to the network
+            byte[] encodedTxBytes = Encoder.encodeToMsgPack(signedTx);
+            Response<PostTransactionsResponse> rawtxresponse = client.RawTransaction().rawtxn(encodedTxBytes)
+                    .execute(headers, values);
+            if (!rawtxresponse.isSuccessful()) {
+                throw new Exception(rawtxresponse.message());
+            }
+            String id = rawtxresponse.body().txId;
+            // Wait for transaction confirmation
+            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
+
+            // We list the account information for acct1
+            // and check that the asset is no longer exist
+            System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
+
+            System.out.println("Alice Account = " + alice.getAddress().toString());
+            printAssetHolding(alice, assetID);
+            printBalance(alice);
+            System.out.println("Bob Account = " + bob.getAddress().toString());
+            printAssetHolding(bob, assetID);
+            printBalance(bob);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    public void revokeAsset(Account alice, Account bob, Long assetID) throws Exception {
+        System.out.println(String.format(""));
+        System.out.println(String.format("==> REVOKE (CLAWBACK) BOB'S ASSETS"));
+        // REVOKE ASSET
+
+        Response<TransactionParametersResponse> resp = client.TransactionParams().execute();
+        if (!resp.isSuccessful()) {
+            throw new Exception(resp.message());
+        }
+        TransactionParametersResponse params = resp.body();
+        if (params == null) {
+            throw new Exception("Params retrieval error");
+        }
+
+        BigInteger assetAmount = BigInteger.valueOf(100);
+        Transaction tx = Transaction.AssetClawbackTransactionBuilder()
+        .sender(alice.getAddress())
+                .assetClawbackFrom(bob.getAddress())
+                .assetReceiver(alice.getAddress())
+                .assetAmount(assetAmount)
+                .assetIndex(assetID)
+                .suggestedParams(params).build();
+
+        // The transaction must be signed by the current manager account
+        SignedTransaction signedTx = alice.signTransaction(tx);
+        // send the transaction to the network and
+        try {
+
+            String[] headers = { "Content-Type" };
+            String[] values = { "application/x-binary" };
+            // Submit the transaction to the network
+            byte[] encodedTxBytes = Encoder.encodeToMsgPack(signedTx);
+            Response<PostTransactionsResponse> rawtxresponse = client.RawTransaction().rawtxn(encodedTxBytes)
+                    .execute(headers, values);
+            if (!rawtxresponse.isSuccessful()) {
+                throw new Exception(rawtxresponse.message());
+            }
+            String id = rawtxresponse.body().txId;
+            // Wait for transaction confirmation
+            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
+
+            // We list the account information for acct1
+            // and check that the asset is no longer exist
+            System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
+
+            System.out.println("Alice Account = " + alice.getAddress().toString());
+            printAssetHolding(alice, assetID);
+            printBalance(alice);
+            System.out.println("Bob Account = " + bob.getAddress().toString());
+            printAssetHolding(bob, assetID);
+            printBalance(bob);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    // transfer back from Bob to Alice and closeout asset
+    public void closeoutAssetHoldings(Account bob, Account alice, Long assetID, BigInteger assetAmount) throws Exception {
+        // System.out.println(String.format(""));
+        // System.out.println(String.format("==> ATTEMPT TO TRANSFER ASSETS BACK FROM BOB TO ALICE"));   
+        // ATTEMP TO TRANSFER ASSETS BACK TO ALICE FROM BOB
+        // THIS SHOULD FAIL for Amount > 0 
+        // TRANSFER ASSET
+
+        Response<TransactionParametersResponse> resp = client.TransactionParams().execute();
+        if (!resp.isSuccessful()) {
+            throw new Exception(resp.message());
+        }
+        TransactionParametersResponse params = resp.body();
+        if (params == null) {
+            throw new Exception("Params retrieval error");
+        }
+        // System.out.println("Algorand suggested parameters: " + params);
+        // BigInteger assetAmount = BigInteger.valueOf(100000);
 
         Transaction tx = Transaction.AssetTransferTransactionBuilder()
                 .sender(bob.getAddress())
@@ -395,8 +508,7 @@ public class GettingStartedASAIntegrations {
                 .assetAmount(assetAmount)
                 .assetIndex(assetID)
                 .assetCloseTo(alice.getAddress())
-                .suggestedParams(params)
-                .build();
+                .suggestedParams(params).build();
 
         // The transaction must be signed by the current manager account
         SignedTransaction signedTx = bob.signTransaction(tx);
@@ -414,7 +526,10 @@ public class GettingStartedASAIntegrations {
             }
             String id = rawtxresponse.body().txId;
             // Wait for transaction confirmation
-            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client,id,4);          
+            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
+
+            // We list the account information for acct1
+            // and check that the asset is no longer exist
             System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
 
             // We can now list the account information for acct3
@@ -457,11 +572,8 @@ public class GettingStartedASAIntegrations {
         // set destroy asset specific parameters
         // The manager must sign and submit the transaction
         // asset close to
-        Transaction tx = Transaction.AssetDestroyTransactionBuilder()
-                .sender(alice.getAddress())
-                .assetIndex(myAssetID)
-                .suggestedParams(params)
-                .build();
+        Transaction tx = Transaction.AssetDestroyTransactionBuilder().sender(alice.getAddress()).assetIndex(myAssetID)
+                .suggestedParams(params).build();
         // The transaction must be signed by the manager account
         SignedTransaction signedTxn = alice.signTransaction(tx);
         // send the transaction to the network
@@ -478,11 +590,11 @@ public class GettingStartedASAIntegrations {
             }
             String id = rawtxresponse.body().txId;
             // Wait for transaction confirmation
-            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client,id,4);          
-            System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
+            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
 
             // We list the account information for acct1
             // and check that the asset is no longer exist
+            System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
             System.out.println("Account = " + alice.getAddress().toString());
             System.out.println("AssetID destroyed  = " + myAssetID.toString());
             // System.out.println("Closing Amount = " + pTrx.closingAmount.toString());
@@ -641,6 +753,7 @@ public class GettingStartedASAIntegrations {
             }
     }
 
+ 
 
     // Print Balance for Account
     private void printBalance(Account myAccount) throws Exception {
@@ -657,24 +770,47 @@ public class GettingStartedASAIntegrations {
     }
 
     public static void main(String args[]) throws Exception {
-        GettingStartedASAIntegrations t = new GettingStartedASAIntegrations();
+        GettingStartedASASecurityTokens t = new GettingStartedASASecurityTokens();
+
         System.out.println(String.format(""));
         System.out.println(String.format("==> CREATE ALICE'S ACCOUNT"));
         Account Alice = t.createAccount(true); // Alice
         System.out.println(String.format(""));
         System.out.println(String.format("==> CREATE BOB'S ACCOUNT"));
-        Account Bob = t.createAccount(false); // Bob created w 0 Algos
+        // Bob created w 0 Algos
+        Account Bob = t.createAccount(false); 
+
         // Use Alice account as a faucet to fund Bob
         // fund with 202000 to cover min=100000, plus 100000 for asset,
         // plus 3000 for three transactions (optin , transfer asset, close out account)
         t.transferAlgos(Alice, Bob);
         Long assetID = t.createFTAsset(Alice); // Alice creates Asset
+
         // Bob Opts in
         t.optIn(Bob, assetID);
         // Alice transfers asset to Bob
         t.transferAsset(Alice, Bob, assetID);
-        // Send back asset to Alice, and close out Bobs holding account
-        t.closeoutAssetHoldings(Bob, Alice, assetID);
+
+        t.freezeAsset(Alice, Bob, assetID);
+        // try to transaction
+        try{
+            System.out.println(String.format(""));
+            System.out.println(String.format("==> ATTEMP TO TRANSFER ASSETS BACK TO ALICE FROM BOB"));
+            System.out.println(String.format("==> THIS SHOULD FAIL AS BOB'S ACCOUNT IS FROZEN"));            
+            t.closeoutAssetHoldings(Bob, Alice, assetID, BigInteger.valueOf(100));
+        }
+        catch (Exception e) {
+            System.err.println("Exception when calling transfer from frozen account: " + e.getMessage());
+        }
+        System.out.println(String.format(""));
+        System.out.println(String.format("==> TRANSFER NOT ALLOWED WHEN FROZEN"));
+
+        t.revokeAsset(Alice, Bob, assetID);
+        //  close out Bobs holding account
+        System.out.println(String.format(""));
+        System.out.println(String.format("==> BOB CLOSEOUT ASSETS TO ALICE"));
+        t.closeoutAssetHoldings(Bob, Alice, assetID, BigInteger.valueOf(0));
+
         // Asset can be only de destroyed if Alice (creator) has all the Assets
         t.destroyFTAsset(Alice, assetID);
         t.closeoutAlgos(Alice, Bob);

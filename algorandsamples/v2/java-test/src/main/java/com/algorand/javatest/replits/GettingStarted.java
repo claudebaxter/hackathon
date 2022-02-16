@@ -1,4 +1,4 @@
-package com.algorand.javatest.firsttransaction;
+package com.algorand.javatest.replits;
 import com.algorand.algosdk.account.Account;
 import java.util.Scanner;
 import com.algorand.algosdk.crypto.Address;

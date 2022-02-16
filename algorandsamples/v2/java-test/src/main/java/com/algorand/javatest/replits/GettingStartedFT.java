@@ -1,13 +1,12 @@
-package com.algorand.javatest.assets;
+package com.algorand.javatest.replits;
 
 import com.algorand.algosdk.account.Account;
 
 import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+//import java.nio.file.Files;
+//import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Scanner;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.model.*;
@@ -17,15 +16,12 @@ import com.algorand.algosdk.v2.client.common.*;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.CryptoProvider;
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
-
 // see ASA param conventions here: https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0003.md
 
-public class GettingStartedNFT {
-        
-  
+public class GettingStartedFT {
     // Create Account
     static Scanner scan = new Scanner(System.in);
     public String DISPENSER = "HZ57J3K46JIJXILONBBZOHX6BKPXEM2VVXNRFSUED6DKFD5ZD24PMJ3MVA";
@@ -38,7 +34,6 @@ public class GettingStartedNFT {
         digest.update(Arrays.copyOf(data, data.length));
         return digest.digest();
     }
-
     public Account createAccount() throws Exception {
         try {
             Account myAccount1 = new Account();
@@ -72,9 +67,11 @@ public class GettingStartedNFT {
         AlgodClient client = new AlgodClient(ALGOD_API_ADDR, ALGOD_PORT, ALGOD_API_TOKEN);
         return client;
     }
-    public Long createNFTAsset(Account aliceAccount) throws Exception {
+    // Create the Asset:
+    public Long createFTAsset(Account alice) throws Exception {
         System.out.println(String.format(""));
-        System.out.println(String.format("==> CREATE ASSET"));    
+        System.out.println(String.format("==> CREATE ASSET"));        
+      
         if (client == null)
             this.client = connectToNetwork();
 
@@ -90,39 +87,19 @@ public class GettingStartedNFT {
         JSONObject jsonObj = new JSONObject(params.toString());
         System.out.println("Algorand suggested parameters: " + jsonObj.toString(2));
 
-        // Create the Asset:
+   
 
-        boolean defaultFrozen = false;
-        String unitName = "ALICEART";
-        String assetName = "Alice's Artwork@arc3";
+        String unitName = "ALICECOI";
+        String assetName = "Alice's Artwork Coins@arc3";
         String url = "https://s3.amazonaws.com/your-bucket/metadata.json";
-        byte[] imageFile = Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/NFT/alice-nft.png"));
-        byte[] imgHash = digest(imageFile); 
-        String imgSRI = "sha256-" + Base64.getEncoder().encodeToString(imgHash);
-        System.out.println("image_integrity : " + String.format(imgSRI));
-        // Use imgSRI as the metadata  for "image_integrity": 
-        // "sha256-/tih/7ew0eziEZIVD4qoTWb0YrElAuRG3b40SnEstyk=",
 
-    
-        byte[] metadataFILE = Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/NFT/metadata.json"));
-        // use this to verify that the metadatahash displayed in the asset creation response is correct
-        // cat metadata.json | openssl dgst -sha256 -binary | openssl base64 -A     
-        byte[] assetMetadataHash = digest(metadataFILE); 
-        // String assetMetadataSRI = Base64.getEncoder().encodeToString(assetMetadataHash);
-        // System.out.println(String.format(assetMetadataSRI));
-
-       
-        String assetMetadataHashString = "16efaa3924a6fd9d3a4824799a4ac65d";
-
-        // var metadataJSON = {
-        //     "name": "ALICEART",
-        //     "description": "Alice's Artwork",
-        //     "image": "https:\/\/s3.amazonaws.com\/your-bucket\/images\/alice-nft.png",
-        //     "image_integrity": "sha256-/tih/7ew0eziEZIVD4qoTWb0YrElAuRG3b40SnEstyk=",
-        //     "properties": {
-        //         "simple_property": "Alice's first artwork",
+        // var {
+        //     "name": "ALICECOI",
+        //     "description": "Alice's Coins",
+        //        "properties": {
+        //         "simple_property": "Alice's coins",
         //         "rich_property": {
-        //             "name": "AliceArt",
+        //             "name": "AliceCoi",
         //             "value": "001",
         //             "display_value": "001",
         //             "class": "emphasis",
@@ -133,37 +110,17 @@ public class GettingStartedNFT {
         //             }
         //         },
         //         "array_property": {
-        //             "name": "Artwork",
+        //             "name": "Alice Coins",
         //             "value": [1, 2, 3, 4],
         //             "class": "emphasis"
         //         }
         //     }
         // }
-
-
-        Address manager = aliceAccount.getAddress();  // OPTIONAL: FOR DEMO ONLY, USED TO DESTROY ASSET WITHIN THIS SCRIPT
+        boolean defaultFrozen = false;
+        Address manager = alice.getAddress(); // OPTIONAL: FOR DEMO ONLY, USED TO DESTROY ASSET WITHIN THIS SCRIPT
         Address reserve = null;
         Address freeze = null;
         Address clawback = null;
-        //
-        // For non-fractional NFT ASA simply set the 
-        // assetTotal to 1 and decimals to 0
-   
-        // or
-        // A fractional non-fungible token (fractional NFT)
-        // has the following properties:
-
-        // Total Number of Units (t) MUST be a power of 10 larger than 1: 10, 100, 1000,
-        // ...
-        // Number of Digits after the Decimal Point MUST be equal to the
-        // logarithm in base 10 of total number of units.
-        // In other words, the total supply of the ASA is exactly 1.
-
-        // fractional example for total number of this asset available
-        // for circulation 100 units of .01 fraction each.
-        // fractional example
-        // Integer decimals = 2;
-        // BigInteger assetTotal = BigInteger.valueOf(100);
 
         // Use actual total > 1 to create a Fungible Token
 
@@ -177,18 +134,24 @@ public class GettingStartedNFT {
         // assetTotal = 1, decimals = 0, result is 1 total actual
 
         // set quantity and decimal placement
-        BigInteger assetTotal = BigInteger.valueOf(1);
-        // decimals and assetTotal
+        BigInteger assetTotal = BigInteger.valueOf(1000000);
+        // integer number of decimals for asset unit calculation
         Integer decimals = 0;
+        // System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        // byte[] metadataFILE = Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/FT/metadata.json"));    
+        // use this to verify that the metadatahash displayed in the asset creation response is correct
+        // cat metadata.json | openssl dgst -sha256 -binary | openssl base64 -A
 
+        // byte[] assetMetadataHash = digest(metadataFILE); 
+        String assetMetadataHashstr = "16efaa3924a6fd9d3a4824799a4ac65d";
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
-                .sender(aliceAccount.getAddress().toString())
+                .sender(alice.getAddress().toString())
                 .assetTotal(assetTotal)
                 .assetDecimals(decimals)
                 .assetUnitName(unitName)
                 .assetName(assetName)
                 .url(url)
-                .metadataHashUTF8(assetMetadataHashString)
+                .metadataHashUTF8(assetMetadataHashstr)
                 .manager(manager)
                 .reserve(reserve)
                 .freeze(freeze)
@@ -198,7 +161,7 @@ public class GettingStartedNFT {
                 .build();
 
         // Sign the Transaction with creator account
-        SignedTransaction signedTxn = aliceAccount.signTransaction(tx);
+        SignedTransaction signedTxn = alice.signTransaction(tx);
         Long assetID = null;
         try {
             // Submit the transaction to the network
@@ -214,13 +177,13 @@ public class GettingStartedNFT {
             String id = rawtxresponse.body().txId;
 
             // Wait for transaction confirmation
-            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client,id,4);          
+            PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
             System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
 
             assetID = pTrx.assetIndex;
             System.out.println("AssetID = " + assetID);
-            printCreatedAsset(aliceAccount, assetID);
-            printAssetHolding(aliceAccount, assetID);
+            printCreatedAsset(alice, assetID);
+            printAssetHolding(alice, assetID);
             return assetID;
         } catch (Exception e) {
             e.printStackTrace();
@@ -229,9 +192,9 @@ public class GettingStartedNFT {
 
     }
 
-    public void destroyNFTAsset(Account alice, Long myAssetID) throws Exception {
+    public void destroyFTAsset(Account alice, Long myAssetID) throws Exception {
         System.out.println(String.format(""));
-        System.out.println(String.format("==> DESTROY ASSET"));
+        System.out.println(String.format("==> DESTROY ASSET"));  
 
         if (client == null)
             this.client = connectToNetwork();
@@ -255,11 +218,8 @@ public class GettingStartedNFT {
         // set destroy asset specific parameters
         // The manager must sign and submit the transaction
         // asset close to
-        Transaction tx = Transaction.AssetDestroyTransactionBuilder()
-                .sender(alice.getAddress())
-                .assetIndex(myAssetID)
-                .suggestedParams(params)
-                .build();
+        Transaction tx = Transaction.AssetDestroyTransactionBuilder().sender(alice.getAddress())
+                .assetIndex(myAssetID).suggestedParams(params).build();
         // The transaction must be signed by the manager account
         SignedTransaction signedTxn = alice.signTransaction(tx);
         // send the transaction to the network
@@ -291,26 +251,25 @@ public class GettingStartedNFT {
             String accountInfo = client.AccountInformation(alice.getAddress()).execute().toString();
             JSONObject jsonObj2 = new JSONObject(accountInfo.toString());
             System.out.println("Account information (with assets destroyed) : " + jsonObj2.toString(2));
-
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
 
     }
-    // send funds back to dispenser
-    public void closeoutAccount(Account alice) throws Exception {
+                // send funds back to dispenser
+    public void closeoutAccount(Account aliceAccount) throws Exception {
         System.out.println(String.format(""));
         System.out.println(String.format("==> CLOSE OUT ALICE'S ALGOS TO DISPENSER"));
 
         if (client == null)
             this.client = connectToNetwork();
 
-        printBalance(alice);
+        printBalance(aliceAccount);
 
         try {
             // Construct the transaction
-            final String RECEIVER = DISPENSER;
+
             String note = "Hello World";
             Response < TransactionParametersResponse > resp = client.TransactionParams().execute();
             if (!resp.isSuccessful()) {
@@ -323,16 +282,16 @@ public class GettingStartedNFT {
             JSONObject jsonObj = new JSONObject(params.toString());
             System.out.println("Algorand suggested parameters: " + jsonObj.toString(2));
             Transaction txn = Transaction.PaymentTransactionBuilder()
-                .sender(alice.getAddress().toString())
+                .sender(aliceAccount.getAddress().toString())
                 .note(note.getBytes())
-                .amount(0) // 
-                .receiver(alice.getAddress().toString())
+                .amount(0) 
+                .receiver(aliceAccount.getAddress().toString())
                 .suggestedParams(params)
-                .closeRemainderTo(RECEIVER) 
+                .closeRemainderTo(DISPENSER) 
                 .build();
            
             // Sign the transaction
-            SignedTransaction signedTxn = alice.signTransaction(txn);
+            SignedTransaction signedTxn = aliceAccount.signTransaction(txn);
             System.out.println("Signed transaction with txid: " + signedTxn.transactionID);
 
             // Submit the transaction to the network
@@ -359,12 +318,13 @@ public class GettingStartedNFT {
             if (pTrx.closingAmount != null){
              System.out.println("Closing Amount: " + new String(pTrx.closingAmount.toString()));                 
             }          
-            printBalance(alice);
+            printBalance(aliceAccount);
 
         } catch (Exception e) {
             System.err.println("Exception when calling algod#transactionInformation: " + e.getMessage());
         }
     }
+
 
     // utility function to print created asset
     public void printCreatedAsset(Account account, Long assetID) throws Exception {
@@ -423,7 +383,7 @@ public class GettingStartedNFT {
             }
     }
 
-    
+   
     private String printBalance(com.algorand.algosdk.account.Account myAccount) throws Exception {
         String myAddress = myAccount.getAddress().toString();
         Response < com.algorand.algosdk.v2.client.model.Account > respAcct = client.AccountInformation(myAccount.getAddress()).execute();
@@ -433,13 +393,13 @@ public class GettingStartedNFT {
         com.algorand.algosdk.v2.client.model.Account accountInfo = respAcct.body();
         System.out.println(String.format("Account Balance: %d microAlgos", accountInfo.amount));
         return myAddress;
-    } 
+    }
 
     public static void main(String args[]) throws Exception {
-        GettingStartedNFT t = new GettingStartedNFT();
+        GettingStartedFT t = new GettingStartedFT();
         Account aliceAccount = t.createAccount();
-        Long assetID = t.createNFTAsset(aliceAccount);
-        t.destroyNFTAsset(aliceAccount, assetID);
+        Long assetID = t.createFTAsset(aliceAccount);
+        t.destroyFTAsset(aliceAccount, assetID);
         t.closeoutAccount(aliceAccount);
     }
 }
