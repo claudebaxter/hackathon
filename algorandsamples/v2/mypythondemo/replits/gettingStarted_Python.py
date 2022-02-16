@@ -2,9 +2,7 @@ import json
 import base64
 from algosdk import account
 from algosdk.v2client import algod
-# from algosdk.future.transaction import PaymentTxn
-# from algosdk.future.transaction import wait_for_confirmation
-from algosdk.future.transaction import *
+from algosdk.future import transaction
 import time
 
 # # This is a complete code example that:
@@ -63,7 +61,7 @@ def getting_started_example():
 	amount = 100000
 	closeto= "HZ57J3K46JIJXILONBBZOHX6BKPXEM2VVXNRFSUED6DKFD5ZD24PMJ3MVA"
     # Fifth argument is a close_remainder_to parameter that creates a payment txn that sends all of the remaining funds to the specified address. If you want to learn more, go to: https://developer.algorand.org/docs/reference/transactions/#payment-transaction
-	unsigned_txn = PaymentTxn(my_address, params, receiver, amount, closeto, note)
+	unsigned_txn = transaction.PaymentTxn(my_address, params, receiver, amount, closeto, note)
 
     # sign transaction
 	print("Signing transaction")
@@ -76,7 +74,7 @@ def getting_started_example():
     # wait for confirmation	
 	try:
 		print("Waiting for confirmation")
-		confirmed_txn = wait_for_confirmation(algod_client, txid, 4)  
+		confirmed_txn = transaction.wait_for_confirmation(algod_client, txid, 4)  
 	except Exception as err:
 		print(err)
 		return

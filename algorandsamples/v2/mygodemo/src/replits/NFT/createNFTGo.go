@@ -4,15 +4,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
-	// "errors"
 	"fmt"
 	"io"
 	"os"
-	// "strings"
 	"github.com/algorand/go-algorand-sdk/future"
-
 	"github.com/algorand/go-algorand-sdk/client/v2/algod"
-	// "github.com/algorand/go-algorand-sdk/client/v2/common/models"
 	"github.com/algorand/go-algorand-sdk/crypto"
 
 	transaction "github.com/algorand/go-algorand-sdk/future"
@@ -56,7 +52,7 @@ func main() {
 	fmt.Printf("--> The SRI of alice-nft.png is: '%s'\n\n", imgSRI)
 
 	// Add data to template file
-	fmt.Println("Creating metadata.json with Alice's asset data...\n")
+	fmt.Println("Creating metadata.json with Alice's asset data...")
 	// see metadata.json
 
 	// Hash the metadata.json file
@@ -67,7 +63,7 @@ func main() {
 	// Pin the file to storage platform
 	fmt.Println("Pinning files to storage platform...")
 	fmt.Println("--> alice-nft.png")
-	fmt.Println("--> metadata.json\n")
+	fmt.Println("--> metadata.json")
 
 	// Instantiate algod client
 	const algodAddress = "https://academy-algod.dev.aws.algodev.network"
