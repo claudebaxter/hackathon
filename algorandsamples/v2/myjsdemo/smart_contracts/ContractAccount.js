@@ -4,12 +4,12 @@ const algosdk = require('algosdk');
 // const server = "<algod-address>";
 // const port = <algod-port>;
 
-// const token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-// const server = "http://localhost";
-// const port = 4001;
-const token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1";
-const server = "http://hackathon.algodev.network";
-const port = 9100;
+const token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+const server = "http://localhost";
+const port = 4001;
+// const token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1";
+// const server = "http://hackathon.algodev.network";
+// const port = 9100;
 
 // Import the filesystem module 
 const fs = require('fs'); 
@@ -24,8 +24,8 @@ let algodclient = new algosdk.Algodv2(token, server, port);
     // get suggested parameters
     let params = await algodclient.getTransactionParams().do();
     // comment out the next two lines to use suggested fee
-    params.fee = 1000;
-    params.flatFee = true;
+    // params.fee = 1000;
+    // params.flatFee = true;
     console.log(params);
     // create logic sig
     // samplearg.teal

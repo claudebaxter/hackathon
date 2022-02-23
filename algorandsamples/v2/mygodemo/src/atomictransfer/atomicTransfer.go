@@ -4,13 +4,9 @@ import (
 	"context"
 	"crypto/ed25519"
 	json "encoding/json"
-	// "errors"
 	"fmt"
-	// "strings"
 
 	"github.com/algorand/go-algorand-sdk/client/v2/algod"
-	// "github.com/algorand/go-algorand-sdk/client/v2/common/models"
-
 	"github.com/algorand/go-algorand-sdk/crypto"
 	"github.com/algorand/go-algorand-sdk/mnemonic"
 	"github.com/algorand/go-algorand-sdk/transaction"
@@ -19,9 +15,9 @@ import (
 )
 
 // This atomic transfer example code requires three (3) acounts:
-//  - account1 requires a user-defined mnemonic and be funded with 1001000 microAlgos
-//  - account2 requires a user-defined mnemonic and be funded with 2001000 microAlgos
-//  - account3 auto-generated within the code, 1000000 microAlgos will be transfered here
+//  - account1 requires a user-defined mnemonic and be funded with 101000 microAlgos
+//  - account2 requires a user-defined mnemonic and be funded with 201000 microAlgos
+//  - account3 auto-generated within the code, 100000 microAlgos will be transfered here
 // For account1 and account2, replcace the string "Your 25-word mnemonic goes here" in the code below.
 // For account3, ensure you note the mnemonic generated for future.
 // Faucents available for funding accounts:
@@ -30,9 +26,14 @@ import (
 // Replace the algodToken and algodAddress parameters below to connect to your API host.
 
 // user declared account mnemonics for account1 and account2
+// never us mnemonics in code. This is for demo purposes only.
 const mnemonic1 = "price clap dilemma swim genius fame lucky crack torch hunt maid palace ladder unlock symptom rubber scale load acoustic drop oval cabbage review abstract embark"
 const mnemonic2 = "unlock garage rack news treat bonus census describe stuff habit harvest imitate cheap lemon cost favorite seven tomato viable same exercise letter dune able add"
-const mnemonic3 = "obey plate another blur jungle dynamic noise gift coach belt chronic pair hybrid valve blouse page submit typical poet hole hold begin doll ability master"
+
+// user declared account mnemonics for account1 and account2
+// const mnemonic1 = "Your 25-word mnemonic goes here"
+// const mnemonic2 = "Your 25-word mnemonic goes here"
+
 
 // user declared algod connection parameters
 const algodAddress = "http://localhost:4001"
@@ -106,15 +107,15 @@ func main() {
 	fmt.Println("Loading two existing accounts...")
 	account1 := getAddress(mnemonic1)
 	account2 := getAddress(mnemonic2)
-    account3 := getAddress(mnemonic3)
+
 	// convert mnemonic1 and mnemonic2 using the mnemonic.ToPrivateKey() helper function
 	sk1, err := mnemonic.ToPrivateKey(mnemonic1)
 	sk2, err := mnemonic.ToPrivateKey(mnemonic2)
 
 	// generate account3, display mnemonic, wait
-	// fmt.Println("Generating new account...")
-	// account3 := generateNewAccount()
-	// fmt.Println("!! NOTICE !! Please retain the above generated \"25-word mnemonic passphrase\" for future use.")
+	fmt.Println("Generating new account...")
+	account3 := generateNewAccount()
+	fmt.Println("!! NOTICE !! Please retain the above generated \"25-word mnemonic passphrase\" for future use.")
 
 	// display account balances
 	fmt.Println("Initial balances:")

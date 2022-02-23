@@ -49,8 +49,8 @@ def write_multisig_unsigned_transaction_to_file():
     msig = Multisig(version, threshold, [account_1, account_2])
 
     print("Multisig Address: ", msig.address())
-    print("Please go to: https://bank.testnet.algorand.network/ to fund multisig account.", msig.address())
-    # input("Please go to: https://bank.testnet.algorand.network/ to fund multisig account." + '\n' + "Press Enter to continue...")
+    print("Please go to: https://dispenser.testnet.aws.algodev.network/ to fund multisig account.", msig.address())
+    # input("Please go to: https://dispenser.testnet.aws.algodev.network/ to fund multisig account." + '\n' + "Press Enter to continue...")
 
     # get suggested parameters
     params = algod_client.suggested_params()

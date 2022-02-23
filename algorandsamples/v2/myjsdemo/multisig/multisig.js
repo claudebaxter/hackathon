@@ -4,6 +4,9 @@ const algosdk = require('algosdk');
 const token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1";
 const server = "http://hackathon.algodev.network";
 const port = 9100;
+// const token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+// const server = "http://localhost";
+// const port = 4001;
 const keypress = async () => {
     process.stdin.setRawMode(true)
     return new Promise(resolve => process.stdin.once('data', () => {
@@ -15,11 +18,10 @@ const keypress = async () => {
 (async () => {
     // recover accounts
     // paste in mnemonic phrases here for each account
-
     // let account1_mnemonic = "PASTE phrase for account 1";
     // let account2_mnemonic = "PASTE phrase for account 2";
     // let account3_mnemonic = "PASTE phrase for account 3"
-
+    // never use mnemonics in production code, replace for demo purposes only
     let account1_mnemonic = "patrol target joy dial ethics flip usual fatigue bulb security prosper brand coast arch casino burger inch cricket scissors shoe evolve eternal calm absorb school";
     let account2_mnemonic = "genius inside turtle lock alone blame parent civil depend dinosaur tag fiction fun skill chief use damp daughter expose pioneer today weasel box about silly";
     let account3_mnemonic = "off canyon mystery cable pluck emotion manual legal journey grit lunch include friend social monkey approve lava steel school mango auto cactus huge ability basket"
@@ -45,8 +47,10 @@ const keypress = async () => {
     let multsigaddr = algosdk.multisigAddress(mparams);
     console.log("Multisig Address: " + multsigaddr);
     //Pause execution to allow using the dispenser on testnet to put tokens in account
-    console.log('Dispense funds to this account on TestNet https://bank.testnet.algorand.network/');
-    // await keypress();
+    console.log("Add funds to multisig account using the TestNet Dispenser: ");
+    console.log("https://dispenser.testnet.aws.algodev.network?account=" + multsigaddr);
+    console.log("Once funded, press any key to continue");
+    await keypress();
     try {
         let algodclient = new algosdk.Algodv2(token, server, port);
 

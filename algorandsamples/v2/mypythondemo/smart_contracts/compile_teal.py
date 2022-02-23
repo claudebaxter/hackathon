@@ -1,7 +1,6 @@
 # compile TEAL code
-from algosdk import transaction, account, mnemonic
+
 from algosdk.v2client import algod
-from algosdk.future.transaction import PaymentTxn, LogicSig
 import os
 
 # read file

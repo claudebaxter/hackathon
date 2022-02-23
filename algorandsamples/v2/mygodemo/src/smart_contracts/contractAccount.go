@@ -5,7 +5,7 @@ import (
 	"crypto/ed25519"
 	"encoding/base64"
 	"encoding/binary"
-	// "encoding/json"
+
 	"io/ioutil"
 	"log"
 	"os"

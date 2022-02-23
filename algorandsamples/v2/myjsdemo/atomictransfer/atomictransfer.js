@@ -14,13 +14,17 @@ async function setupClient() {
     return client;
 }
 // recover first account
+// never use mnemonics in code, for demo purposes only
 function recoverAccount1() {
+    // const passphrase = "Your 25-word mnemonic goes here";
+
     const passphrase = "price clap dilemma swim genius fame lucky crack torch hunt maid palace ladder unlock symptom rubber scale load acoustic drop oval cabbage review abstract embark";
     let myAccount = algosdk.mnemonicToSecretKey(passphrase);
     return myAccount;
 }
 // recover second account
 function recoverAccount2() {
+    // const passphrase = "Your 25-word mnemonic goes here";
     const passphrase = "unlock garage rack news treat bonus census describe stuff habit harvest imitate cheap lemon cost favorite seven tomato viable same exercise letter dune able add";
     let myAccount = algosdk.mnemonicToSecretKey(passphrase);
     return myAccount;
@@ -59,7 +63,7 @@ async function submitAtomicTransfer() {
         // Transaction A to C 
         let transaction1 = algosdk.makePaymentTxnWithSuggestedParams(myAccountA.addr, myAccountC, 100000, undefined, undefined, params);
         // Create transaction B to A
-        let transaction2 = algosdk.makePaymentTxnWithSuggestedParams(myAccountB.addr, myAccountA.addr, 100000, undefined, undefined, params);
+        let transaction2 = algosdk.makePaymentTxnWithSuggestedParams(myAccountB.addr, myAccountA.addr, 200000, undefined, undefined, params);
 
         // Store both transactions
         let txns = [transaction1, transaction2];
@@ -80,7 +84,16 @@ async function submitAtomicTransfer() {
         console.log("Transaction : " + tx.txId);
 
         // Wait for transaction to be confirmed
-        await algosdk.waitForConfirmation(algodClient, tx.txId, 4)
+        confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
+        //Get the completed Transaction
+        console.log("Transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        accountInfo = await algodClient.accountInformation(myAccountA.addr).do();
+        console.log("Account A balance: %d microAlgos", accountInfo.amount);
+        accountInfo = await algodClient.accountInformation(myAccountB.addr).do();
+        console.log("Account B balance: %d microAlgos", accountInfo.amount);  
+        accountInfo = await algodClient.accountInformation(myAccountC).do();
+        console.log("Account C balance: %d microAlgos", accountInfo.amount);   
+
     } catch (err) {
         console.log("err", err);
     }

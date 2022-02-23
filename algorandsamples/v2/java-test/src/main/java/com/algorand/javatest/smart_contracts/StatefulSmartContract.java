@@ -1,8 +1,14 @@
+/* 
+IMPORTANT: The approvalProgramSourceInitial and approvalProgramSourceRefactored 
+are assumed to be executed by the creator with address 
+"ABU6EJ637L6BF3MHLPL5FADI7JSM36J3CZILNP256SQ77HCLE2OACD2C3Y".
+If you are using a different account, change the hard-coded address
+*/
 package com.algorand.javatest.smart_contracts;
 
 import com.algorand.algosdk.util.Encoder;
 
-import java.security.NoSuchAlgorithmException;
+
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,12 +16,9 @@ import java.util.List;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
-import com.algorand.algosdk.v2.client.algod.AccountInformation;
-import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.Application;
@@ -26,8 +29,6 @@ import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
-import com.algorand.algosdk.v2.client.model.TransactionsResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.algorand.algosdk.v2.client.Utils;
 
 public class StatefulSmartContract {
@@ -156,8 +157,12 @@ public class StatefulSmartContract {
             throw new Exception("Params retrieval error");
         }
         // create unsigned transaction
-        Transaction txn = Transaction.ApplicationCallTransactionBuilder().sender(sender).suggestedParams(params)
-                .applicationId(appId).args(appArgs).build();
+        Transaction txn = Transaction.ApplicationCallTransactionBuilder()
+                .sender(sender)
+                .suggestedParams(params)
+                .applicationId(appId)
+                .args(appArgs)
+                .build();
 
         // sign transaction
         SignedTransaction signedTxn = account.signTransaction(txn);

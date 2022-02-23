@@ -1,3 +1,9 @@
+
+# IMPORTANT: The approvalProgramSourceInitial and approvalProgramSourceRefactored 
+# are assumed to be executed by the creator with address 
+# "LD6R3YLIIIEQK5VEYXNXBR775EV4DEOLZB6R7WUZGOTCB2SMJEZTFRPFPY".
+# If you are using a different account, change the hard-coded address
+
 import base64
 import datetime
 import json
@@ -7,6 +13,7 @@ from algosdk.v2client import algod
 from algosdk.future.transaction import *
 
 # user declared account mnemonics
+# never use mnemonics in production code, for demo purposes only
 creator_mnemonic = "Your 25-word mnemonic goes here"
 user_mnemonic = "A second distinct 25-word mnemonic goes here"
 
@@ -38,7 +45,7 @@ local_schema = StateSchema(local_ints, local_bytes)
 
 # REPLACE/Copy creator to below account addr's - IE, LD6R3YLIIIEQK5VEYXNXBR775EV4DEOLZB6R7WUZGOTCB2SMJEZTFRPFPY
 # user declared approval program (initial)
-approval_program_source_initial = b"""#pragma version 2
+approval_program_source_initial = b"""#pragma version 5
 // Handle each possible OnCompletion type. We don't have to worry about
 // handling ClearState, because the ClearStateProgram will execute in that
 // case, not the ApprovalProgram.
@@ -144,7 +151,7 @@ return
 """
 
 # user declared approval program (refactored)
-approval_program_source_refactored = b"""#pragma version 2
+approval_program_source_refactored = b"""#pragma version 5
 // Handle each possible OnCompletion type. We don't have to worry about
 // handling ClearState, because the ClearStateProgram will execute in that
 // case, not the ApprovalProgram.
@@ -256,7 +263,7 @@ return
 """
  
 # declare clear state program source
-clear_program_source = b"""#pragma version 2
+clear_program_source = b"""#pragma version 5
 int 1
 """
 

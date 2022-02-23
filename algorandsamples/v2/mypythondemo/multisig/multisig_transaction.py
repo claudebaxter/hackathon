@@ -9,6 +9,7 @@ from algosdk.future.transaction import *
 # mnemonic1 = "PASTE phrase for account 1"
 # mnemonic2 = "PASTE phrase for account 2"
 # mnemonic3 = "PASTE phrase for account 3"
+# never use mnemonics in production code, replace for demo purposes only
 
 mnemonic1 = "patrol target joy dial ethics flip usual fatigue bulb security prosper brand coast arch casino burger inch cricket scissors shoe evolve eternal calm absorb school"
 mnemonic2 = "genius inside turtle lock alone blame parent civil depend dinosaur tag fiction fun skill chief use damp daughter expose pioneer today weasel box about silly"
@@ -34,8 +35,9 @@ threshold = 2  # how many signatures are necessary
 msig = Multisig(version, threshold, [account_1, account_2])
 
 print("Multisig Address: ", msig.address())
-print("Please go to: https://bank.testnet.algorand.network/ to fund multisig account.", msig.address())
-# input("Please go to: https://bank.testnet.algorand.network/ to fund multisig account." + '\n' + "Press Enter to continue...")
+print('Go to the below link to fund the created account using testnet faucet: \n https://dispenser.testnet.aws.algodev.network/?account={}'.format(msig.address())) 
+
+input("Press Enter to continue...")
 
 # Specify your node address and token. This must be updated.
 # algod_address = ""  # ADD ADDRESS

@@ -3,12 +3,9 @@ package main
 import (
 	"context"
 	"crypto/ed25519"
-	// "errors"
 	"fmt"
 	"io/ioutil"
-	// "strings"
 	"github.com/algorand/go-algorand-sdk/future"
-
 	"github.com/algorand/go-algorand-sdk/client/v2/algod"
 	"github.com/algorand/go-algorand-sdk/crypto"
 	"github.com/algorand/go-algorand-sdk/encoding/msgpack"

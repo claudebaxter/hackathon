@@ -1,6 +1,4 @@
 import json
-import time
-import base64
 from algosdk import mnemonic
 from algosdk.v2client import algod
 from algosdk.future.transaction import *
@@ -17,13 +15,14 @@ def getting_started_example():
 # Part 2
 # send from account 3 to account 2 and sign from Account 1
 # demo notes: delete 3 accounts and change these passphrases
+# never use mnemonics in production code, replace for demo purposes only
+
     account1_passphrase = "install blossom apart critic exhibit rather author ability arrest mango segment salute damage deer release obey help whip illness fever best relief voyage absent asset"
     account2_passphrase = "butter private lunar heavy explain panic melt dog want athlete animal stay bless spoon switch language check know zone return parade blossom apple ability injury"
     account3_passphrase = "cup major panther cycle merit fox over cram tower trumpet road option flee evoke plate one aspect napkin wife banana poet august kitchen absorb local"
     
     account1 = mnemonic.to_public_key(account1_passphrase)
     account2 = mnemonic.to_public_key(account2_passphrase)    
-    private_key = mnemonic.to_private_key(account3_passphrase)
     account3 = mnemonic.to_public_key(account3_passphrase)
 
     print("Account 1 : {}".format(account1))

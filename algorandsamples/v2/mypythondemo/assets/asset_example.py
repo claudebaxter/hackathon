@@ -11,6 +11,7 @@ from algosdk.future.transaction import *
 # mnemonic1 = "PASTE your phrase for account 1"
 # mnemonic2 = "PASTE your phrase for account 2"
 # mnemonic3 = "PASTE your phrase for account 3"
+# never use mnemonics in production code, replace for demo purposes only
 
 mnemonic1 = "nothing material goat machine silk exclude undo speed service dizzy trap owner brown old often start fire van ring trap mammal decade number absent panel"
 mnemonic2 = "ignore pottery token buzz slide once aim fan health ski punch tuna drop legal lizard unaware peasant venue denial helmet royal hint river above type"
@@ -287,8 +288,8 @@ if not holding:
 # transfer asset of 10 from account 1 to account 3
 params = algod_client.suggested_params()
 # comment these two lines if you want to use suggested params
-params.fee = 1000
-params.flat_fee = True
+# params.fee = 1000
+# params.flat_fee = True
 txn = AssetTransferTxn(
     sender=accounts[1]['pk'],
     sp=params,

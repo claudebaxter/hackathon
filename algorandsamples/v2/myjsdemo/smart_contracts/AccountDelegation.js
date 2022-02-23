@@ -23,8 +23,8 @@ let algodclient = new algosdk.Algodv2(token, server, port);
     // get suggested parameter
     let params = await algodclient.getTransactionParams().do();
     // comment out the next two lines to use suggested fee 
-    params.fee = 1000;
-    params.flatFee = true;
+    // params.fee = 1000;
+    // params.flatFee = true;
     console.log(params);
     // create logic sig
     // samplearg.teal

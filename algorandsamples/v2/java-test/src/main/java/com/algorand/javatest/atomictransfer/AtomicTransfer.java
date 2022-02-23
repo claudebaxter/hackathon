@@ -43,6 +43,7 @@ public class AtomicTransfer {
         // final String account1_mnemonic = "Your 25-word mnemonic goes here";
         // final String account2_mnemonic = "Your 25-word mnemonic goes here";
         // final String account3_mnemonic = "Your 25-word mnemonic goes here";
+        // never use mnemonics in code, for demo purposes only
         final String account1_mnemonic = "buzz genre work meat fame favorite rookie stay tennis demand panic busy hedgehog snow morning acquire ball grain grape member blur armor foil ability seminar";
         final String account2_mnemonic = "design country rebuild myth square resemble flock file whisper grunt hybrid floor letter pet pull hurry choice erase heart spare seven idea multiply absent seven";
         final String account3_mnemonic = "news slide thing empower naive same belt evolve lawn ski chapter melody weasel supreme abuse main olive sudden local chat candy daughter hand able drip";
@@ -98,8 +99,8 @@ public class AtomicTransfer {
                 throw new Exception(response.message());
             }
             String id = response.body().txId;
-            // wait for confirmation
-                        // Wait for transaction confirmation
+
+            // Wait for transaction confirmation
             PendingTransactionResponse pTrx = Utils.waitForConfirmation(client, id, 4);
             System.out.println("Transaction " + id + " confirmed in round " + pTrx.confirmedRound);
             // Read the transaction

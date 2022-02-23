@@ -94,8 +94,8 @@ func main() {
         return
     }
     // comment out the next two (2) lines to use suggested fees
-    txParams.FlatFee = true
-    txParams.Fee = 1000
+    // txParams.FlatFee = true
+    // txParams.Fee = 1000
 
     // Make transaction
     // const receiver = "<receiver-address>"

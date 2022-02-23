@@ -1,10 +1,6 @@
 import json
-import time
-import base64
-import os
 from algosdk.v2client import algod
 from algosdk import mnemonic
-from algosdk import encoding
 from algosdk import account
 from algosdk.future.transaction import *
 
@@ -20,9 +16,12 @@ from algosdk.future.transaction import *
 # Replace the algod_address and algod_token parameters below to connect to your API host.
 
 # user declared account mnemonics for account1 and account2
+# mnemonic_1 = "Your 25-word mnemonic goes here"
+# mnemonic_2 = "Your 25-word mnemonic goes here"
+#  never use mnemonics in code, for demo purposes only
 mnemonic_1 = "price clap dilemma swim genius fame lucky crack torch hunt maid palace ladder unlock symptom rubber scale load acoustic drop oval cabbage review abstract embark"
 mnemonic_2 = "unlock garage rack news treat bonus census describe stuff habit harvest imitate cheap lemon cost favorite seven tomato viable same exercise letter dune able add"
-mnemonic_3 = "obey plate another blur jungle dynamic noise gift coach belt chronic pair hybrid valve blouse page submit typical poet hole hold begin doll ability master"
+# mnemonic_3 = "obey plate another blur jungle dynamic noise gift coach belt chronic pair hybrid valve blouse page submit typical poet hole hold begin doll ability master"
 
 # user declared algod connection parameters
 algod_address = "http://localhost:4001"
@@ -31,7 +30,6 @@ algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 # algod_token = "8024065d94521d253181cff008c44fa4ae4bdf44f028834cd4b4769a26282de1"
 # algod_token = "2f3203f21e738a1de6110eba6984f9d03e5a95d7a577b34616854064cf2c0e7b"
 # algod_address = "https://academy-algod.dev.aws.algodev.network/"
-
 
 
 # utility function to get address string
@@ -69,7 +67,7 @@ def group_transactions():
     print("Loading two existing accounts TO SIGN, and account_3 to recieve")
     account_1 = get_address(mnemonic_1)
     account_2 = get_address(mnemonic_2)
-    account_3 = get_address(mnemonic_3)
+    account_3 = generate_new_account()
 # convert mnemonic1 and mnemonic2 using the mnemonic.ToPrivateKey() helper function
     sk_1 = mnemonic.to_private_key(mnemonic_1)
     sk_2 = mnemonic.to_private_key(mnemonic_2)
@@ -88,8 +86,8 @@ def group_transactions():
 # get node suggested parameters
     params = algod_client.suggested_params()
     # comment out the next two (2) lines to use suggested fees
-    params.flat_fee = True
-    params.fee = 1000
+    # params.flat_fee = True
+    # params.fee = 1000
 
 # create transactions
     print("Creating transactions...")

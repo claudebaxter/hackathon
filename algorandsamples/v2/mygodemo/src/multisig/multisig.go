@@ -4,14 +4,9 @@ import (
 	"context"
 	"crypto/ed25519"
 	"fmt"
-	// "errors"
-	// "strings"
 	json "encoding/json"
-	// "io/ioutil"
 	"github.com/algorand/go-algorand-sdk/future"
-
-	"github.com/algorand/go-algorand-sdk/client/v2/algod"
-	
+	"github.com/algorand/go-algorand-sdk/client/v2/algod"	
 	"github.com/algorand/go-algorand-sdk/crypto"
 	"github.com/algorand/go-algorand-sdk/mnemonic"
 	"github.com/algorand/go-algorand-sdk/transaction"
@@ -35,6 +30,7 @@ func loadAccounts() (map[int][]byte, map[int]string) {
 	// mnemonic1 := "PASTE phrase for account 1"
 	// mnemonic2 := "PASTE phrase for account 2"
 	// mnemonic3 := "PASTE phrase for account 3"
+    // never use mnemonics in production code, replace for demo purposes only
 
 	mnemonic1 := "predict mandate aware dizzy limit match hazard fantasy victory auto fortune hello public dragon ostrich happy blue spray parrot island odor actress only ability hurry"
 	mnemonic2 := "moon grid random garlic effort faculty fence gym write skin they joke govern home huge there claw skin way bid fit bean damp able only"
@@ -110,10 +106,12 @@ func main() {
 	}
 
 	fromAddr, _ := ma.Address()
-	// Print multisig account
-    fmt.Printf("Here is your multisig address : %s \n", fromAddr.String())
-    fmt.Println("Please go to: https://bank.testnet.algorand.network/ to fund your multisig account.")
-//	fmt.Scanln() // wait for Enter Key
+	// Fund account
+	fmt.Println("Fund multisig account using testnet faucet:\n--> https://dispenser.testnet.aws.algodev.network?account=" + fromAddr.String())
+	fmt.Println("--> Once funded, press ENTER key to continue...")
+
+
+	//	fmt.Scanln() // wait for Enter Key
 
     toAddr := addr3.String()
     var amount uint64 = 10000

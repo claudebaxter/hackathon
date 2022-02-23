@@ -92,6 +92,7 @@ try:
     lsig = LogicSig(program, args=[arg1])
 
     # Recover the account that is wanting to delegate signature
+    # never use mnemonics in production code, for demo purposes only
     passphrase = "canal enact luggage spring similar zoo couple stomach shoe laptop middle wonder eager monitor weather number heavy skirt siren purity spell maze warfare ability ten"
     # passphrase = "<25-word-mnemonic>"
     sk = mnemonic.to_private_key(passphrase)
