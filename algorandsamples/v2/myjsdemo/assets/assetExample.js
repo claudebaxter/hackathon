@@ -65,7 +65,7 @@ const printAssetHolding = async function (algodclient, account, assetid) {
 // var account3_mnemonic = "PASTE your phrase for account 3"
 
 
-var account1_mnemonic = "canal enact luggage spring similar zoo couple stomach shoe laptop middle wonder eager monitor weather number heavy skirt siren purity spell maze warfare ability ten";
+var account1_mnemonic = "earn demise stamp couch reward ramp potato hard bargain clog genius awkward prosper setup eager ensure coast fine bicycle theory ginger plastic quantum abandon jazz";
 var account2_mnemonic = "beauty nurse season autumn curve slice cry strategy frozen spy panic hobby strong goose employ review love fee pride enlist friend enroll clip ability runway";
 var account3_mnemonic = "picnic bright know ticket purity pluck stumble destroy ugly tuna luggage quote frame loan wealth edge carpet drift cinnamon resemble shrimp grain dynamic absorb edge";
 

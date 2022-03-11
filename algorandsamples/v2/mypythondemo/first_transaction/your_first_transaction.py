@@ -8,11 +8,11 @@ from algosdk.future.transaction import *
 
 
 def getting_started_example():
-	# algod_address = "http://localhost:4001"
-	# algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-	# algod_client = algod.AlgodClient(algod_token, algod_address)
-	algod_address = "http://hackathon.algodev.network:9100"
-	algod_token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
+	algod_address = "http://localhost:4001"
+	algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	algod_client = algod.AlgodClient(algod_token, algod_address)
+	# algod_address = "http://hackathon.algodev.network:9100"
+	# algod_token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
 
 	algod_client = algod.AlgodClient(algod_token, algod_address)
 
@@ -29,7 +29,6 @@ def getting_started_example():
 	# generate a public/private key pair
 	secret_key = mnemonic.to_private_key(passphrase)
 	my_address = mnemonic.to_public_key(passphrase)
-
 
 	print("My address: {}".format(my_address))
 

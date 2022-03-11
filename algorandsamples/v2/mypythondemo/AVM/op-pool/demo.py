@@ -7,9 +7,10 @@ import base64
 import os
 
 
-token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-url = "http://localhost:4001"
-
+# token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+# url = "http://localhost:4001"
+token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
+url = "http://hackathon.algodev.network:9100"
 _verify = b"A"*64 # 64 bytes since thats the length of a valid signature
 
 client = algod.AlgodClient(token, url)

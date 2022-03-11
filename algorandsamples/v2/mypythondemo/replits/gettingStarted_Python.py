@@ -19,8 +19,11 @@ def getting_started_example():
     # algod_address = "https://academy-algod.dev.aws.algodev.network/"
     # algod_address = "http://hackathon.algodev.network:9100"
     # algod_token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
+
 	algod_address = "http://hackathon.algodev.network:9100"
 	algod_token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
+	# algod_address = "http://localhost:4001"
+	# algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 	algod_client = algod.AlgodClient(algod_token, algod_address)
 
@@ -28,7 +31,7 @@ def getting_started_example():
 	secret_key, my_address = account.generate_account()
     
 	print("My address: {}".format(my_address))
-
+	print("My private key: {}".format(secret_key))
     # Check your balance. It should be 0 microAlgos
 
 	account_info = algod_client.account_info(my_address)
@@ -43,7 +46,7 @@ def getting_started_example():
 
 	print('Fund transfer in process...')
     # Wait for the faucet to transfer funds
-	time.sleep(10)
+	# time.sleep(10)
     
 	print('Fund transferred!')
     # Check your balance. It should be 5000000 microAlgos
